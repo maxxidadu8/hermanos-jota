@@ -2,7 +2,7 @@ const productos = [
   {
     id: "aparador-uspallata",
     nombre: "Aparador Uspallata",
-    imagen: "Aparador Uspallata.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Aparador Uspallata.png",
     descripcion:
       "Aparador de seis puertas fabricado en nogal sostenible con correderas metálicas en acabado latón. Su silueta minimalista realza el veteado natural de la madera.",
     detalles: {
@@ -16,7 +16,7 @@ const productos = [
   {
     id: "biblioteca-recoleta",
     nombre: "Biblioteca Recoleta",
-    imagen: "Biblioteca Recoleta.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Biblioteca Recoleta.png",
     descripcion:
       "Sistema modular de estantes abierto que combina estructura de acero Sage Green y repisas en roble claro. Ideal para crear composiciones elegantes y dinámicas.",
     detalles: {
@@ -30,7 +30,7 @@ const productos = [
   {
     id: "butaca-mendoza",
     nombre: "Butaca Mendoza",
-    imagen: "Butaca Mendoza.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Butaca Mendoza.png",
     descripcion:
       "Butaca tapizada en bouclé Dusty Rose con base de madera de guatambú. El respaldo curvo abraza el cuerpo y ofrece comodidad contemporánea.",
     detalles: {
@@ -44,7 +44,7 @@ const productos = [
   {
     id: "sillon-copacabana",
     nombre: "Sillón Copacabana",
-    imagen: "Sill¢n Copacabana.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/sillon-copacabana.png",
     descripcion:
       "Sillón lounge en cuero cognac con base giratoria en acero. Su silueta combina modernismo y estética brasileña.",
     detalles: {
@@ -58,7 +58,7 @@ const productos = [
   {
     id: "mesa-centro-araucaria",
     nombre: "Mesa de Centro Araucaria",
-    imagen: "Mesa de Centro Araucaria.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Mesa de Centro Araucaria.png",
     descripcion:
       "Mesa de centro con sobre circular de mármol Patagonia y base de tres patas en madera de nogal. Un punto focal escultural para cualquier sala.",
     detalles: {
@@ -72,7 +72,7 @@ const productos = [
   {
     id: "mesa-noche-aconcagua",
     nombre: "Mesa de Noche Aconcagua",
-    imagen: "Mesa de Noche Aconcagua.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Mesa de Noche Aconcagua.png",
     descripcion:
       "Mesa de noche con cajón oculto y repisa inferior en roble certificado FSC®. Sus líneas minimalistas permiten disfrutar de la calidez del material.",
     detalles: {
@@ -86,7 +86,7 @@ const productos = [
   {
     id: "sofa-patagonia",
     nombre: "Sofá Patagonia",
-    imagen: "Sof\u00a0 Patagonia.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/sofa-patagonia.png",
     descripcion:
       "Sofá de tres cuerpos tapizado en lino Warm Alabaster con patas cortas de madera. Los cojines combinan espuma de alta resiliencia con plumón reciclado.",
     detalles: {
@@ -100,7 +100,7 @@ const productos = [
   {
     id: "mesa-comedor-pampa",
     nombre: "Mesa Comedor Pampa",
-    imagen: "Mesa Comedor Pampa.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Mesa Comedor Pampa.png",
     descripcion:
       "Mesa extensible de roble macizo con sistema de plegado y apertura suave. Su diseño robusto y elegante invita a grandes reuniones.",
     detalles: {
@@ -114,7 +114,7 @@ const productos = [
   {
     id: "sillas-cordoba",
     nombre: "Sillas Córdoba",
-    imagen: "Sillas C¢rdoba.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/sillas-cordoba.png",
     descripcion:
       "Set de cuatro sillas apilables en contrachapado moldeado de nogal y estructura tubular pintada. Diseño versátil para comedor u oficina.",
     detalles: {
@@ -128,7 +128,7 @@ const productos = [
   {
     id: "escritorio-costa",
     nombre: "Escritorio Costa",
-    imagen: "Escritorio Costa.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Escritorio Costa.png",
     descripcion:
       "Escritorio compacto con cajón organizado y tapa basculante integrada en bambú laminado. Ideal para espacios de trabajo en casa.",
     detalles: {
@@ -142,7 +142,7 @@ const productos = [
   {
     id: "silla-trabajo-belgrano",
     nombre: "Silla de Trabajo Belgrano",
-    imagen: "Silla de Trabajo Belgrano.png",
+    imagen: "https://maxxidadu8.github.io/hermanos-jota/assets/img/Silla de Trabajo Belgrano.png",
     descripcion:
       "Silla ergonómica regulable en altura con respaldo de malla transpirable y asiento tapizado en tejido reciclado. Diseñada para largas jornadas.",
     detalles: {

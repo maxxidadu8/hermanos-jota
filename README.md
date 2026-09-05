@@ -14,4 +14,7 @@ Abrir `index.html` en un navegador o servir la carpeta con cualquier servidor es
 
 ## Integrantes
 
-Pendiente de completar por el equipo.
+- Ezequiel Lagos
+- Fabricio Almuna
+- Maximiliano Dadurian
+- Felipe Gazcon
