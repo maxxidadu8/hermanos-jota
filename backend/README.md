@@ -54,6 +54,15 @@ GET /api/productos/no-existe
 
 Se monta antes de las rutas y llama a `next()` para continuar el procesamiento.
 
+## Cuerpos JSON
+
+El middleware global `express.json()` se monta antes de las rutas. Cuando una
+petición envía `Content-Type: application/json`, convierte su cuerpo JSON en un
+objeto disponible en `req.body` para las futuras rutas POST.
+
+Este middleware prepara la lectura del cuerpo; las rutas POST se implementarán
+cuando corresponda.
+
 ## Organización
 
 - `app.js`: configura Express y monta las rutas.
