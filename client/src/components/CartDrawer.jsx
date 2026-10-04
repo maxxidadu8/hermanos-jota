@@ -92,21 +92,23 @@ function CartDrawer({
           )}
         </div>
 
-        {carrito.length > 0 && (
-          <div className="cart-drawer__foot">
-            <p className="cart-summary">
-              {cantidadTotal} {cantidadTotal === 1 ? "pieza" : "piezas"} · precio a consultar
-            </p>
-            <div className="cart-drawer__actions">
-              <button type="button" className="button button--ghost" onClick={onVaciar}>
-                Vaciar
-              </button>
-              <a className="button" href="#" onClick={(e) => irA(e, "contacto")}>
-                Solicitar consulta
-              </a>
-            </div>
-          </div>
-        )}
+        <div className="cart-drawer__foot">
+          {carrito.length > 0 && (
+            <>
+              <p className="cart-summary">
+                {cantidadTotal} {cantidadTotal === 1 ? "pieza" : "piezas"} · precio a consultar
+              </p>
+              <div className="cart-drawer__actions">
+                <button type="button" className="button button--ghost" onClick={onVaciar}>
+                  Vaciar
+                </button>
+                <a className="button" href="#" onClick={(e) => irA(e, "contacto")}>
+                  Solicitar consulta
+                </a>
+              </div>
+            </>
+          )}
+        </div>
       </aside>
     </>
   );

@@ -7,6 +7,14 @@ import ProductDetail from "./components/ProductDetail.jsx";
 import ContactForm from "./components/ContactForm.jsx";
 import CartDrawer from "./components/CartDrawer.jsx";
 
+// Mismos títulos que tenía cada página del sitio original.
+const titulos = {
+  inicio: "Hermanos Jota | Muebles con historia",
+  catalogo: "Catálogo | Hermanos Jota",
+  detalle: "Producto | Hermanos Jota",
+  contacto: "Contacto | Hermanos Jota",
+};
+
 function App() {
   // Vista actual: "inicio", "catalogo", "detalle" o "contacto".
   const [vista, setVista] = useState("inicio");
@@ -45,6 +53,10 @@ function App() {
       cancelado = true;
     };
   }, [intento]);
+
+  useEffect(() => {
+    document.title = titulos[vista];
+  }, [vista]);
 
   useEffect(() => {
     document.body.classList.toggle("cart-open", carritoAbierto);
