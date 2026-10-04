@@ -92,6 +92,8 @@ aunque todavía no haya una ruta POST permanente.
 - `app.js`: configura Express y monta las rutas.
 - `server.js`: inicia el servidor HTTP.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
+- `controllers/productosController.js`: lista los productos y busca por ID;
+  envía los errores al manejador centralizado mediante `next(error)`.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
 - `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
 - `middlewares/errorHandler.js`: centraliza las respuestas de error en JSON.
