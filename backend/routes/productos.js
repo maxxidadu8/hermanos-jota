@@ -9,11 +9,13 @@ router.get("/", (req, res) => {
 });
 
 // GET /api/productos/:id: devuelve una pieza o un error 404 si no existe.
-router.get("/:id", (req, res) => {
+router.get("/:id", (req, res, next) => {
   const producto = productos.find((p) => p.id === req.params.id);
 
   if (!producto) {
-    return res.status(404).json({ error: "Producto no encontrado" });
+    const error = new Error("Producto no encontrado");
+    error.status = 404;
+    return next(error);
   }
 
   res.json(producto);

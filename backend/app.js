@@ -1,6 +1,8 @@
 const express = require("express");
 const logger = require("./middlewares/logger");
 const productosRouter = require("./routes/productos");
+const notFound = require("./middlewares/notFound");
+const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
@@ -11,5 +13,9 @@ app.use(logger);
 app.use(express.json());
 
 app.use("/api/productos", productosRouter);
+
+// Después de las rutas: primero el 404 y, al final, los errores.
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
