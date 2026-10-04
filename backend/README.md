@@ -63,10 +63,36 @@ objeto disponible en `req.body` para las futuras rutas POST.
 Este middleware prepara la lectura del cuerpo; las rutas POST se implementarán
 cuando corresponda.
 
+## Respuestas de error
+
+Después de las rutas se monta el manejador de rutas inexistentes y, al final,
+el manejador centralizado de errores. Las rutas pueden enviar un error a este
+último con `next(error)`.
+
+- Ruta inexistente: `404` y `{ "error": "Ruta no encontrada" }`.
+- Producto inexistente: `404` y `{ "error": "Producto no encontrado" }`.
+- Cuerpo JSON inválido: `400` y `{ "error": "JSON inválido en el cuerpo de la petición" }`.
+- Error interno: `500` y `{ "error": "Error interno del servidor" }`. El detalle
+  se registra en la terminal, sin enviar el stack al cliente.
+
+Después de reiniciar el servidor, se pueden comprobar estas respuestas desde
+otra terminal:
+
+```bash
+curl -i http://localhost:3001/ruta-inexistente
+curl -i http://localhost:3001/api/productos/no-existe
+curl -i -X POST http://localhost:3001/api/productos -H 'Content-Type: application/json' -d '{"nombre":'
+```
+
+La última petición comprueba el procesamiento del JSON antes de las rutas,
+aunque todavía no haya una ruta POST permanente.
+
 ## Organización
 
 - `app.js`: configura Express y monta las rutas.
 - `server.js`: inicia el servidor HTTP.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
+- `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
+- `middlewares/errorHandler.js`: centraliza las respuestas de error en JSON.
 - `data/productos.js`: contiene los datos locales del catálogo.
