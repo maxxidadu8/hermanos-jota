@@ -32,8 +32,24 @@ Si falta la URI o la conexión falla, termina con código de error y muestra un
 mensaje sin exponer credenciales. La selección del servidor tiene un tiempo
 máximo de 10 segundos.
 
-Este primer paso prepara la conexión: los endpoints todavía consultan el array
-local. El modelo `Product` y las consultas a MongoDB se incorporarán por separado.
+La conexión y el modelo `Product` están preparados. Los endpoints todavía
+consultan el array local; las consultas a MongoDB se incorporarán por separado.
+
+## Modelo Product
+
+El modelo se define en `models/Product.js` mediante un esquema de Mongoose:
+
+| Campo | Tipo | Obligatorio |
+| --- | --- | --- |
+| `nombre` | String | Sí |
+| `descripcion` | String | No |
+| `precio` | Number | Sí |
+| `stock` | Number | No |
+| `imagenUrl` | String | No |
+
+Mongoose genera automáticamente un `_id` para cada producto. El precio `0` es
+válido: obligatorio significa que el campo debe estar presente, sin establecer
+un precio mínimo en esta etapa.
 
 El servidor utiliza el puerto `3001` por defecto. Se puede cambiar con la variable
 de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
@@ -116,6 +132,7 @@ aunque todavía no haya una ruta POST permanente.
 - `app.js`: configura Express y monta las rutas.
 - `server.js`: carga las variables de entorno y conecta la base antes de iniciar el servidor HTTP.
 - `config/db.js`: establece la conexión con MongoDB mediante Mongoose.
+- `models/Product.js`: define el esquema y el modelo de productos.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
 - `controllers/productosController.js`: lista los productos y busca por ID;
   envía los errores al manejador centralizado mediante `next(error)`.
