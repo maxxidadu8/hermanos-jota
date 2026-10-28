@@ -8,8 +8,32 @@ Desde esta carpeta:
 
 ```bash
 npm install
+cp .env.example .env
+```
+
+Editar `backend/.env` y reemplazar el ejemplo de `MONGODB_URI` por la cadena de
+conexión de MongoDB Atlas, incluyendo el nombre de la base `hermanos-jota`.
+En Atlas, crear un usuario de base de datos y permitir la IP desde la que se
+ejecutará la API. Si la contraseña contiene caracteres especiales, deben estar
+codificados para una URL en la cadena de conexión.
+
+El archivo `.env` contiene credenciales y está excluido de Git. Solo se versiona
+`.env.example`, que contiene valores de ejemplo. Las variables configuradas en
+el entorno de ejecución tienen prioridad sobre las del archivo.
+
+Después de configurar la conexión:
+
+```bash
 npm start
 ```
+
+La API espera a que Mongoose se conecte a MongoDB antes de escuchar peticiones.
+Si falta la URI o la conexión falla, termina con código de error y muestra un
+mensaje sin exponer credenciales. La selección del servidor tiene un tiempo
+máximo de 10 segundos.
+
+Este primer paso prepara la conexión: los endpoints todavía consultan el array
+local. El modelo `Product` y las consultas a MongoDB se incorporarán por separado.
 
 El servidor utiliza el puerto `3001` por defecto. Se puede cambiar con la variable
 de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
@@ -90,7 +114,8 @@ aunque todavía no haya una ruta POST permanente.
 ## Organización
 
 - `app.js`: configura Express y monta las rutas.
-- `server.js`: inicia el servidor HTTP.
+- `server.js`: carga las variables de entorno y conecta la base antes de iniciar el servidor HTTP.
+- `config/db.js`: establece la conexión con MongoDB mediante Mongoose.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
 - `controllers/productosController.js`: lista los productos y busca por ID;
   envía los errores al manejador centralizado mediante `next(error)`.
