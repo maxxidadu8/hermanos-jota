@@ -2,6 +2,7 @@ const express = require("express");
 const {
   listarProductos,
   obtenerProductoPorId,
+  crearProducto,
 } = require("../controllers/productosController");
 
 const router = express.Router();
@@ -11,5 +12,8 @@ router.get("/", listarProductos);
 
 // GET /api/productos/:id: devuelve una pieza o un error 404 si no existe.
 router.get("/:id", obtenerProductoPorId);
+
+// POST /api/productos: guarda un producto y devuelve 201.
+router.post("/", crearProducto);
 
 module.exports = router;

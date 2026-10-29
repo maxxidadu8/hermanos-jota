@@ -59,6 +59,10 @@ de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
 
 ## Rutas
 
+- `POST /api/productos`: crea un producto en MongoDB y responde `201` con el
+  documento guardado, incluido su `_id`. Solo acepta los cinco campos del modelo.
+  Si el cuerpo no es un objeto o falla la validación de Mongoose, responde `400`.
+
 - `GET /api/productos`: responde con estado `200` y el array completo de productos
   en formato JSON, consultado con `Product.find()` en MongoDB.
 - `GET /api/productos/:id`: responde con estado `200` y el objeto del producto
@@ -103,10 +107,7 @@ Se monta antes de las rutas y llama a `next()` para continuar el procesamiento.
 
 El middleware global `express.json()` se monta antes de las rutas. Cuando una
 petición envía `Content-Type: application/json`, convierte su cuerpo JSON en un
-objeto disponible en `req.body` para las futuras rutas POST.
-
-Este middleware prepara la lectura del cuerpo; las rutas POST se implementarán
-cuando corresponda.
+objeto disponible en `req.body` para crear productos mediante POST.
 
 ## Respuestas de error
 
@@ -115,6 +116,7 @@ el manejador centralizado de errores. Las rutas pueden enviar un error a este
 último con `next(error)`.
 
 - Ruta inexistente: `404` y `{ "error": "Ruta no encontrada" }`.
+- Datos de creación inválidos: `400` con un mensaje de validación.
 - ID inválido: `400` y `{ "error": "ID de producto inválido" }`.
 - Producto inexistente: `404` y `{ "error": "Producto no encontrado" }`.
 - Cuerpo JSON inválido: `400` y `{ "error": "JSON inválido en el cuerpo de la petición" }`.
@@ -130,8 +132,8 @@ curl -i http://localhost:3001/api/productos/no-existe
 curl -i -X POST http://localhost:3001/api/productos -H 'Content-Type: application/json' -d '{"nombre":'
 ```
 
-La última petición comprueba el procesamiento del JSON antes de las rutas,
-aunque todavía no haya una ruta POST permanente.
+La última petición comprueba que un cuerpo JSON mal formado se rechaza antes de
+ejecutar el controlador de creación.
 
 ## Organización
 
@@ -140,7 +142,7 @@ aunque todavía no haya una ruta POST permanente.
 - `config/db.js`: establece la conexión con MongoDB mediante Mongoose.
 - `models/Product.js`: define el esquema y el modelo de productos.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
-- `controllers/productosController.js`: lista los productos y busca por ID;
+- `controllers/productosController.js`: lista, busca por ID y crea productos;
   envía los errores al manejador centralizado mediante `next(error)`.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
 - `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
@@ -152,3 +154,17 @@ aunque todavía no haya una ruta POST permanente.
 Desde `backend`, ejecutar `npm test`. Las pruebas verifican las consultas y el
 manejo de errores con respuestas simuladas del modelo; no requieren Atlas ni
 sustituyen una prueba real de conexión y consulta a MongoDB.
+
+## Crear un producto
+
+Con la API iniciada, desde otra terminal:
+
+```bash
+curl -i -X POST http://localhost:3001/api/productos \
+  -H 'Content-Type: application/json' \
+  -d '{"nombre":"Mesa de prueba","descripcion":"Producto de prueba","precio":1000,"stock":2,"imagenUrl":""}'
+```
+
+Esta petición guarda un producto real en la base configurada. La respuesta debe
+ser `201`. Consultar `GET /api/productos` permite comprobar que quedó guardado.
+Por ahora, PUT y DELETE están pendientes de implementación.
