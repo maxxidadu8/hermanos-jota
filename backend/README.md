@@ -59,6 +59,12 @@ de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
 
 ## Rutas
 
+- `PUT /api/productos/:id`: actualiza los campos enviados y conserva los omitidos.
+  Devuelve `200` con el producto actualizado, `400` por ID o datos inválidos y
+  `404` si el producto no existe. Valida el documento antes de guardarlo.
+  Solo admite los cinco campos del modelo; no permite cambiar `_id`. Un cuerpo
+  sin campos permitidos se rechaza con `400`.
+
 - `POST /api/productos`: crea un producto en MongoDB y responde `201` con el
   documento guardado, incluido su `_id`. Solo acepta los cinco campos del modelo.
   Si el cuerpo no es un objeto o falla la validación de Mongoose, responde `400`.
@@ -116,7 +122,7 @@ el manejador centralizado de errores. Las rutas pueden enviar un error a este
 último con `next(error)`.
 
 - Ruta inexistente: `404` y `{ "error": "Ruta no encontrada" }`.
-- Datos de creación inválidos: `400` con un mensaje de validación.
+- Datos de creación o actualización inválidos: `400` con un mensaje de validación.
 - ID inválido: `400` y `{ "error": "ID de producto inválido" }`.
 - Producto inexistente: `404` y `{ "error": "Producto no encontrado" }`.
 - Cuerpo JSON inválido: `400` y `{ "error": "JSON inválido en el cuerpo de la petición" }`.
@@ -142,7 +148,7 @@ ejecutar el controlador de creación.
 - `config/db.js`: establece la conexión con MongoDB mediante Mongoose.
 - `models/Product.js`: define el esquema y el modelo de productos.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
-- `controllers/productosController.js`: lista, busca por ID y crea productos;
+- `controllers/productosController.js`: lista, busca por ID, crea y actualiza productos;
   envía los errores al manejador centralizado mediante `next(error)`.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
 - `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
@@ -167,4 +173,17 @@ curl -i -X POST http://localhost:3001/api/productos \
 
 Esta petición guarda un producto real en la base configurada. La respuesta debe
 ser `201`. Consultar `GET /api/productos` permite comprobar que quedó guardado.
-Por ahora, PUT y DELETE están pendientes de implementación.
+Por ahora, DELETE está pendiente de implementación.
+
+## Actualizar un producto
+
+Reemplazar el ID de ejemplo por el `_id` de un producto existente:
+
+```bash
+curl -i -X PUT http://localhost:3001/api/productos/507f1f77bcf86cd799439011 \
+  -H 'Content-Type: application/json' \
+  -d '{"precio":1500,"stock":3}'
+```
+
+La respuesta debe ser `200` con el producto actualizado. Consultar luego el
+mismo ID mediante GET permite comprobar que los cambios quedaron guardados.

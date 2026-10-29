@@ -1,9 +1,77 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const Product = require("../models/Product");
-const { listarProductos, obtenerProductoPorId, crearProducto } = require("../controllers/productosController");
+const { listarProductos, obtenerProductoPorId, crearProducto, actualizarProducto } = require("../controllers/productosController");
 
 const id = "507f1f77bcf86cd799439011";
+
+test("PUT guarda cambios, conserva los campos omitidos y protege el _id", async (t) => {
+  const producto = new Product({ _id: id, nombre: "Mesa", precio: 1000, stock: 2 });
+  const consulta = t.mock.method(Product, "findById", async () => producto);
+  const guardar = t.mock.method(producto, "save", async () => { await producto.validate(); return producto; });
+  const resultado = await ejecutar(actualizarProducto, { id }, { precio: 1500, stock: 0, _id: "507f191e810c19729de860ea", extra: true });
+  assert.equal(resultado.error, undefined);
+  assert.equal(resultado.body, producto);
+  assert.equal(producto.precio, 1500);
+  assert.equal(producto.stock, 0);
+  assert.equal(producto.nombre, "Mesa");
+  assert.equal(String(producto._id), id);
+  assert.equal(producto.get("extra"), undefined);
+  assert.equal(guardar.mock.calls.length, 1);
+  assert.deepEqual(consulta.mock.calls[0].arguments, [id]);
+});
+
+test("PUT rechaza ID inválido y cuerpos vacíos o sin campos permitidos", async (t) => {
+  const consulta = t.mock.method(Product, "findById", async () => null);
+  const invalido = await ejecutar(actualizarProducto, { id: "no-existe" }, { precio: 1 });
+  assert.equal(invalido.error.status, 400);
+  for (const body of [undefined, null, [], "texto", {}, { _id: id }, { $set: { precio: 1 } }]) {
+    const resultado = await ejecutar(actualizarProducto, { id }, body);
+    assert.equal(resultado.error.status, 400);
+    assert.equal(resultado.body, undefined);
+  }
+  assert.equal(consulta.mock.calls.length, 0);
+});
+
+test("PUT devuelve 404 cuando el producto no existe", async (t) => {
+  t.mock.method(Product, "findById", async () => null);
+  const resultado = await ejecutar(actualizarProducto, { id }, { precio: 1 });
+  assert.equal(resultado.error.status, 404);
+  assert.equal(resultado.body, undefined);
+});
+
+test("PUT valida campos obligatorios y numéricos antes de guardar", async (t) => {
+  let cambiosGuardados = 0;
+  t.mock.method(Product, "findById", async () => {
+    const producto = new Product({ _id: id, nombre: "Mesa", precio: 1000, stock: 2 });
+    t.mock.method(producto, "save", async () => {
+      await producto.validate();
+      cambiosGuardados++;
+      return producto;
+    });
+    return producto;
+  });
+  for (const body of [{ nombre: "" }, { nombre: null }, { precio: null }, { precio: "abc" }, { stock: "abc" }]) {
+    const resultado = await ejecutar(actualizarProducto, { id }, body);
+    assert.equal(resultado.error.status, 400);
+    assert.equal(resultado.body, undefined);
+  }
+  assert.equal(cambiosGuardados, 0);
+});
+
+test("PUT delega fallos al consultar y al guardar como errores internos", async (t) => {
+  const error = new Error("Base no disponible");
+  const consulta = t.mock.method(Product, "findById", async () => { throw error; });
+  const falloConsulta = await ejecutar(actualizarProducto, { id }, { precio: 2 });
+  assert.equal(falloConsulta.error, error);
+  consulta.mock.restore();
+  const producto = new Product({ nombre: "Mesa", precio: 1 });
+  t.mock.method(Product, "findById", async () => producto);
+  t.mock.method(producto, "save", async () => { throw error; });
+  const falloGuardado = await ejecutar(actualizarProducto, { id }, { precio: 2 });
+  assert.equal(falloGuardado.error, error);
+  assert.equal(falloGuardado.body, undefined);
+});
 
 async function ejecutar(handler, params = {}, body) {
   const resultado = {};
