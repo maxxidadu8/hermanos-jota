@@ -5,6 +5,7 @@
   "description": "API de productos de Hermanos Jota",
   "main": "server.js",
   "scripts": {
+    "test": "node --test",
     "start": "node server.js",
     "dev": "node --watch server.js"
   },

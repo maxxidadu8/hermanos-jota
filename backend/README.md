@@ -32,8 +32,10 @@ Si falta la URI o la conexión falla, termina con código de error y muestra un
 mensaje sin exponer credenciales. La selección del servidor tiene un tiempo
 máximo de 10 segundos.
 
-La conexión y el modelo `Product` están preparados. Los endpoints todavía
-consultan el array local; las consultas a MongoDB se incorporarán por separado.
+Los endpoints GET consultan MongoDB mediante el modelo `Product`. El array de
+`data/productos.js` queda como referencia del catálogo anterior y ya no se usa
+para responder estas peticiones. Una base sin productos devuelve `[]`; todavía
+no se migraron los productos del catálogo anterior.
 
 ## Modelo Product
 
@@ -58,10 +60,11 @@ de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
 ## Rutas
 
 - `GET /api/productos`: responde con estado `200` y el array completo de productos
-  en formato JSON, tomado de `data/productos.js`.
+  en formato JSON, consultado con `Product.find()` en MongoDB.
 - `GET /api/productos/:id`: responde con estado `200` y el objeto del producto
-  cuyo ID coincide con el solicitado. Si no existe, responde con estado `404`
-  y el JSON `{ "error": "Producto no encontrado" }`.
+  cuyo `_id` coincide con el solicitado, consultado con `Product.findById()`.
+  Si el ID tiene formato inválido, responde `400`. Si tiene formato válido pero
+  no existe, responde `404` y `{ "error": "Producto no encontrado" }`.
 
 Para comprobar la respuesta, abrir `http://localhost:3001/api/productos` en el
 navegador o ejecutar:
@@ -73,11 +76,13 @@ curl http://localhost:3001/api/productos
 Ejemplos de búsqueda por ID:
 
 ```bash
-curl -i http://localhost:3001/api/productos/butaca-mendoza
+# Reemplazar el ID de ejemplo por un _id obtenido del listado.
+curl -i http://localhost:3001/api/productos/507f1f77bcf86cd799439011
 curl -i http://localhost:3001/api/productos/no-existe
 ```
 
-Los IDs son textos como `butaca-mendoza`, no números. Si se ejecuta el servidor
+Los IDs son ObjectId de MongoDB, representados por 24 caracteres hexadecimales.
+Los identificadores anteriores como `butaca-mendoza` ya no son válidos. Si se ejecuta el servidor
 con `npm start`, hay que detenerlo con `Ctrl + C` y volver a iniciarlo después de
 editar el código.
 
@@ -88,7 +93,7 @@ en la terminal del servidor, incluyendo rutas inexistentes y parámetros de cons
 
 ```text
 GET /api/productos
-GET /api/productos/butaca-mendoza
+GET /api/productos/507f1f77bcf86cd799439011
 GET /api/productos/no-existe
 ```
 
@@ -110,6 +115,7 @@ el manejador centralizado de errores. Las rutas pueden enviar un error a este
 último con `next(error)`.
 
 - Ruta inexistente: `404` y `{ "error": "Ruta no encontrada" }`.
+- ID inválido: `400` y `{ "error": "ID de producto inválido" }`.
 - Producto inexistente: `404` y `{ "error": "Producto no encontrado" }`.
 - Cuerpo JSON inválido: `400` y `{ "error": "JSON inválido en el cuerpo de la petición" }`.
 - Error interno: `500` y `{ "error": "Error interno del servidor" }`. El detalle
@@ -139,4 +145,10 @@ aunque todavía no haya una ruta POST permanente.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
 - `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
 - `middlewares/errorHandler.js`: centraliza las respuestas de error en JSON.
-- `data/productos.js`: contiene los datos locales del catálogo.
+- `data/productos.js`: referencia del catálogo anterior, sin uso en los endpoints GET.
+
+## Pruebas locales
+
+Desde `backend`, ejecutar `npm test`. Las pruebas verifican las consultas y el
+manejo de errores con respuestas simuladas del modelo; no requieren Atlas ni
+sustituyen una prueba real de conexión y consulta a MongoDB.
