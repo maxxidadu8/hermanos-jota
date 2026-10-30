@@ -10,8 +10,8 @@ La aplicación actual se organiza en `client` (React y Vite) y `backend`
 - Abrir `http://localhost:5173`. Para compilar el frontend, ejecutar
   `npm run build` dentro de `client`.
 
-El cliente se incorporó desde la segunda entrega. La adaptación al modelo de
-MongoDB, el ruteo y los formularios CRUD están pendientes. Ver el estado en
+El cliente se incorporó desde la segunda entrega. El catálogo y el carrito
+ya utilizan el modelo de MongoDB; el ruteo y los formularios CRUD están pendientes. Ver el estado en
 [client/README.md](client/README.md).
 
 Los HTML y archivos de la raíz descritos debajo corresponden al sitio original.

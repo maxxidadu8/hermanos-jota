@@ -6,7 +6,7 @@ function Catalog({ productos, cargando, error, onReintentar, onVerDetalle }) {
 
   const texto = busqueda.trim().toLowerCase();
   const filtrados = productos.filter((p) =>
-    (p.nombre + p.descripcion + Object.values(p.detalles).join(" "))
+    [p.nombre, p.descripcion ?? ""].join(" ")
       .toLowerCase()
       .includes(texto),
   );
@@ -37,6 +37,7 @@ function Catalog({ productos, cargando, error, onReintentar, onVerDetalle }) {
         error={error}
         onReintentar={onReintentar}
         onVerDetalle={onVerDetalle}
+        mensajeVacio={productos.length === 0 ? "Todavía no hay productos en el catálogo." : "No encontramos productos con esa búsqueda."}
       />
     </main>
   );

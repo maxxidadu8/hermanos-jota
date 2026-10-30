@@ -1,4 +1,6 @@
 import { useState } from "react";
+import ProductImage from "./ProductImage.jsx";
+import { formatearPrecio, describirStock } from "../utils/productos.js";
 
 function ProductDetail({ producto, onVolver, onAgregar }) {
   const [agregado, setAgregado] = useState(false);
@@ -16,9 +18,9 @@ function ProductDetail({ producto, onVolver, onAgregar }) {
         ← Volver al catálogo
       </a>
       <article className="product-detail">
-        <img
+        <ProductImage
           className="product-detail__image"
-          src={`/${producto.imagen}`}
+          imagenUrl={producto.imagenUrl}
           alt={producto.nombre}
           width="1024"
           height="1024"
@@ -27,18 +29,12 @@ function ProductDetail({ producto, onVolver, onAgregar }) {
           <p className="eyebrow">Pieza Hermanos Jota</p>
           <h1>{producto.nombre}</h1>
           <p className="product-detail__description">{producto.descripcion}</p>
-          <p className="price-note">Precio: a consultar</p>
-          <ul className="specs">
-            {Object.entries(producto.detalles).map(([clave, valor]) => (
-              <li key={clave}>
-                <strong>{clave}</strong>
-                <span>{valor}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="price-note">{formatearPrecio(producto.precio)}</p>
+          <p>{describirStock(producto.stock)}</p>
           <button
             type="button"
             className="button"
+            disabled={Number.isFinite(producto.stock) && producto.stock <= 0}
             onClick={() => {
               onAgregar(producto);
               setAgregado(true);

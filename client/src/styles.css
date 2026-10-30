@@ -567,6 +567,11 @@ button {
   }
 }
 /* Panel del carrito ya presente en el sitio. */
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .cart-open {
   overflow: hidden;
 }

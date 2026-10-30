@@ -31,12 +31,19 @@ contacto. La API sí permite crear productos mediante POST.
 
 ## Estado de la integración
 
-Este cliente se recuperó de la segunda entrega en `main`. La API actual utiliza
-MongoDB, mientras que esta interfaz todavía espera `id`, `imagen` y `detalles`
-del catálogo anterior. La adaptación a `_id`, `imagenUrl`, `precio` y `stock`,
-React Router y los formularios de productos se realizarán en los siguientes
-pasos. La compilación comprueba la integración de los archivos; no implica que
-el CRUD desde la interfaz ya esté terminado.
+Este cliente se recuperó de la segunda entrega en `main` y ahora utiliza `_id`
+para identificar los productos en el catálogo y el carrito. Muestra `imagenUrl`,
+`precio` en pesos argentinos y `stock`; ya no requiere el campo `detalles` del
+catálogo anterior. La descripción y la imagen son opcionales: las imágenes
+ausentes o que no cargan se reemplazan por el logo. Se admiten rutas locales y
+URLs completas de imágenes.
+
+La base vacía y las búsquedas sin resultados muestran mensajes. Los productos
+sin stock no se pueden añadir desde el detalle. El carrito continúa siendo
+simulado: muestra el total, pero no reserva ni descuenta stock en MongoDB.
+
+React Router y los formularios CRUD están pendientes. La navegación sigue
+resuelta mediante estado de React en este paso.
 
 Mantener dos terminales: una en `backend` con `npm start` y otra en `client`
 con `npm run dev`. El backend requiere configurar previamente su `.env`.

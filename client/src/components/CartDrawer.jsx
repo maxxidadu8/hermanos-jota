@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import ProductImage from "./ProductImage.jsx";
+import { formatearPrecio } from "../utils/productos.js";
 
 function CartDrawer({
   carrito,
@@ -55,17 +57,17 @@ function CartDrawer({
             </div>
           ) : (
             carrito.map(({ producto, cantidad }) => (
-              <article className="cart-item" key={producto.id}>
-                <img src={`/${producto.imagen}`} alt={producto.nombre} width="80" height="80" />
+              <article className="cart-item" key={producto._id}>
+                <ProductImage imagenUrl={producto.imagenUrl} alt={producto.nombre} width="80" height="80" />
                 <div className="cart-item__info">
                   <h3>{producto.nombre}</h3>
-                  <p>Precio a consultar</p>
+                  <p>{formatearPrecio(producto.precio)} por unidad</p>
                   <div className="cart-item__actions">
                     <div className="qty" role="group" aria-label={`Cantidad de ${producto.nombre}`}>
                       <button
                         type="button"
                         aria-label={`Restar ${producto.nombre}`}
-                        onClick={() => onCambiarCantidad(producto.id, -1)}
+                        onClick={() => onCambiarCantidad(producto._id, -1)}
                       >
                         −
                       </button>
@@ -73,7 +75,7 @@ function CartDrawer({
                       <button
                         type="button"
                         aria-label={`Sumar ${producto.nombre}`}
-                        onClick={() => onCambiarCantidad(producto.id, 1)}
+                        onClick={() => onCambiarCantidad(producto._id, 1)}
                       >
                         +
                       </button>
@@ -81,7 +83,7 @@ function CartDrawer({
                     <button
                       type="button"
                       className="cart-item__remove"
-                      onClick={() => onQuitar(producto.id)}
+                      onClick={() => onQuitar(producto._id)}
                     >
                       Quitar
                     </button>
@@ -96,7 +98,7 @@ function CartDrawer({
           {carrito.length > 0 && (
             <>
               <p className="cart-summary">
-                {cantidadTotal} {cantidadTotal === 1 ? "pieza" : "piezas"} · precio a consultar
+                {cantidadTotal} {cantidadTotal === 1 ? "pieza" : "piezas"} · Total: {formatearPrecio(carrito.reduce((total, { producto, cantidad }) => total + producto.precio * cantidad, 0))}
               </p>
               <div className="cart-drawer__actions">
                 <button type="button" className="button button--ghost" onClick={onVaciar}>

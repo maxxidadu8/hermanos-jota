@@ -40,6 +40,7 @@ function App() {
         return res.json();
       })
       .then((datos) => {
+        if (!Array.isArray(datos)) throw new Error("El catálogo recibido no es una lista");
         if (!cancelado) setProductos(datos);
       })
       .catch(() => {
@@ -75,9 +76,9 @@ function App() {
 
   const agregarAlCarrito = (producto) => {
     setCarrito((actual) =>
-      actual.some((item) => item.producto.id === producto.id)
+      actual.some((item) => item.producto._id === producto._id)
         ? actual.map((item) =>
-            item.producto.id === producto.id
+            item.producto._id === producto._id
               ? { ...item, cantidad: item.cantidad + 1 }
               : item,
           )
@@ -89,7 +90,7 @@ function App() {
     setCarrito((actual) =>
       actual
         .map((item) =>
-          item.producto.id === id
+          item.producto._id === id
             ? { ...item, cantidad: item.cantidad + cambio }
             : item,
         )
@@ -98,7 +99,7 @@ function App() {
   };
 
   const quitarDelCarrito = (id) => {
-    setCarrito((actual) => actual.filter((item) => item.producto.id !== id));
+    setCarrito((actual) => actual.filter((item) => item.producto._id !== id));
   };
 
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
@@ -134,6 +135,7 @@ function App() {
       )}
       {vista === "detalle" && productoSeleccionado && (
         <ProductDetail
+          key={productoSeleccionado._id}
           producto={productoSeleccionado}
           onVolver={() => navegar("catalogo")}
           onAgregar={agregarAlCarrito}
