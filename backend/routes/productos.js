@@ -4,6 +4,7 @@ const {
   obtenerProductoPorId,
   crearProducto,
   actualizarProducto,
+  eliminarProducto,
 } = require("../controllers/productosController");
 
 const router = express.Router();
@@ -19,5 +20,8 @@ router.post("/", crearProducto);
 
 // PUT /api/productos/:id: valida y guarda los cambios de un producto existente.
 router.put("/:id", actualizarProducto);
+
+// DELETE /api/productos/:id: elimina un producto y devuelve 204 sin cuerpo.
+router.delete("/:id", eliminarProducto);
 
 module.exports = router;

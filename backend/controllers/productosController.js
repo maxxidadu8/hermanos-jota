@@ -97,4 +97,25 @@ async function actualizarProducto(req, res, next) {
   }
 }
 
-module.exports = { listarProductos, obtenerProductoPorId, crearProducto, actualizarProducto };
+async function eliminarProducto(req, res, next) {
+  if (!mongoose.isObjectIdOrHexString(req.params.id)) {
+    const error = new Error("ID de producto inválido");
+    error.status = 400;
+    return next(error);
+  }
+
+  try {
+    const producto = await Product.findByIdAndDelete(req.params.id);
+    if (!producto) {
+      const error = new Error("Producto no encontrado");
+      error.status = 404;
+      return next(error);
+    }
+
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { listarProductos, obtenerProductoPorId, crearProducto, actualizarProducto, eliminarProducto };

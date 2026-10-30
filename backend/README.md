@@ -59,6 +59,10 @@ de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
 
 ## Rutas
 
+- `DELETE /api/productos/:id`: elimina el producto por `_id` y devuelve `204`
+  sin cuerpo. Responde `400` si el ID tiene formato inválido y `404` si el
+  producto no existe o ya fue eliminado.
+
 - `PUT /api/productos/:id`: actualiza los campos enviados y conserva los omitidos.
   Devuelve `200` con el producto actualizado, `400` por ID o datos inválidos y
   `404` si el producto no existe. Valida el documento antes de guardarlo.
@@ -148,7 +152,7 @@ ejecutar el controlador de creación.
 - `config/db.js`: establece la conexión con MongoDB mediante Mongoose.
 - `models/Product.js`: define el esquema y el modelo de productos.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
-- `controllers/productosController.js`: lista, busca por ID, crea y actualiza productos;
+- `controllers/productosController.js`: lista, busca por ID, crea, actualiza y elimina productos;
   envía los errores al manejador centralizado mediante `next(error)`.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
 - `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
@@ -173,7 +177,7 @@ curl -i -X POST http://localhost:3001/api/productos \
 
 Esta petición guarda un producto real en la base configurada. La respuesta debe
 ser `201`. Consultar `GET /api/productos` permite comprobar que quedó guardado.
-Por ahora, DELETE está pendiente de implementación.
+Los cinco endpoints del CRUD están implementados.
 
 ## Actualizar un producto
 
@@ -187,3 +191,16 @@ curl -i -X PUT http://localhost:3001/api/productos/507f1f77bcf86cd799439011 \
 
 La respuesta debe ser `200` con el producto actualizado. Consultar luego el
 mismo ID mediante GET permite comprobar que los cambios quedaron guardados.
+
+## Eliminar un producto
+
+Reemplazar el ID de ejemplo por el `_id` del producto que se quiere eliminar.
+Esta operación borra el producto de la base configurada:
+
+```bash
+curl -i -X DELETE http://localhost:3001/api/productos/507f1f77bcf86cd799439011
+```
+
+La respuesta debe ser `204`, sin JSON. Un GET posterior al mismo ID devuelve
+`404`, y el producto deja de aparecer en el listado. Repetir DELETE sobre ese ID
+también devuelve `404`.

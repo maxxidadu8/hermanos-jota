@@ -1,7 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const Product = require("../models/Product");
-const { listarProductos, obtenerProductoPorId, crearProducto, actualizarProducto } = require("../controllers/productosController");
+const { listarProductos, obtenerProductoPorId, crearProducto, actualizarProducto, eliminarProducto } = require("../controllers/productosController");
 
 const id = "507f1f77bcf86cd799439011";
 
@@ -78,6 +78,7 @@ async function ejecutar(handler, params = {}, body) {
   const res = {
     status: (status) => { resultado.status = status; return res; },
     json: (body) => { resultado.body = body; },
+    end: () => { resultado.finalizado = true; },
   };
   await handler(
     { params, body },
@@ -86,6 +87,44 @@ async function ejecutar(handler, params = {}, body) {
   );
   return resultado;
 }
+
+test("DELETE elimina por _id y responde 204 sin cuerpo", async (t) => {
+  const consulta = t.mock.method(Product, "findByIdAndDelete", async () => ({ _id: id }));
+  const resultado = await ejecutar(eliminarProducto, { id });
+  assert.deepEqual(consulta.mock.calls[0].arguments, [id]);
+  assert.equal(consulta.mock.calls.length, 1);
+  assert.equal(resultado.status, 204);
+  assert.equal(resultado.finalizado, true);
+  assert.equal(resultado.body, undefined);
+  assert.equal(resultado.error, undefined);
+});
+
+test("DELETE rechaza IDs inválidos sin consultar MongoDB", async (t) => {
+  const consulta = t.mock.method(Product, "findByIdAndDelete", async () => null);
+  for (const valor of ["no-existe", "123", "z".repeat(24)]) {
+    const resultado = await ejecutar(eliminarProducto, { id: valor });
+    assert.equal(resultado.error.status, 400);
+    assert.equal(resultado.finalizado, undefined);
+  }
+  assert.equal(consulta.mock.calls.length, 0);
+});
+
+test("DELETE responde 404 si el producto no existe o ya fue eliminado", async (t) => {
+  t.mock.method(Product, "findByIdAndDelete", async () => null);
+  const resultado = await ejecutar(eliminarProducto, { id });
+  assert.equal(resultado.error.status, 404);
+  assert.equal(resultado.error.message, "Producto no encontrado");
+  assert.equal(resultado.finalizado, undefined);
+});
+
+test("DELETE delega errores de MongoDB sin confirmar la eliminación", async (t) => {
+  const error = new Error("Base no disponible");
+  t.mock.method(Product, "findByIdAndDelete", async () => { throw error; });
+  const resultado = await ejecutar(eliminarProducto, { id });
+  assert.equal(resultado.error, error);
+  assert.equal(resultado.status, undefined);
+  assert.equal(resultado.finalizado, undefined);
+});
 
 test("lista los productos devueltos por MongoDB, incluido el catálogo vacío", async (t) => {
   for (const productos of [[], [{ _id: id, nombre: "Mesa", precio: 100 }]]) {
