@@ -11,7 +11,8 @@ La aplicación actual se organiza en `client` (React y Vite) y `backend`
   `npm run build` dentro de `client`.
 
 El cliente se incorporó desde la segunda entrega. El catálogo y el carrito
-ya utilizan el modelo de MongoDB; el ruteo y los formularios CRUD están pendientes. Ver el estado en
+ya utilizan el modelo de MongoDB y las páginas públicas tienen rutas con React
+Router. Los formularios CRUD están pendientes. Ver el estado en
 [client/README.md](client/README.md).
 
 Los HTML y archivos de la raíz descritos debajo corresponden al sitio original.

@@ -1,7 +1,7 @@
 import ProductCard from "./ProductCard.jsx";
 
 // Muestra la grilla de productos o el estado de la petición (carga / error).
-function ProductList({ productos, cargando, error, onReintentar, onVerDetalle, mensajeVacio = "Todavía no hay productos en el catálogo." }) {
+function ProductList({ productos, cargando, error, onReintentar, mensajeVacio = "Todavía no hay productos en el catálogo." }) {
   if (cargando) {
     return <p className="estado" role="status">Cargando piezas…</p>;
   }
@@ -24,7 +24,7 @@ function ProductList({ productos, cargando, error, onReintentar, onVerDetalle, m
   return (
     <div className="product-grid">
       {productos.map((producto) => (
-        <ProductCard key={producto._id} producto={producto} onVerDetalle={onVerDetalle} />
+        <ProductCard key={producto._id} producto={producto} />
       ))}
     </div>
   );

@@ -1,18 +1,13 @@
-function Footer({ onNavegar }) {
+import { Link } from "react-router-dom";
+
+function Footer() {
   return (
     <footer className="site-footer">
       <div>
-        <a
-          className="brand footer-brand"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onNavegar("inicio");
-          }}
-        >
+        <Link className="brand footer-brand" to="/">
           <img src="/assets/img/logo.svg" alt="" />
           <span>Hermanos Jota</span>
-        </a>
+        </Link>
       </div>
       <div className="footer-info">
         <span>Av. San Juan 2847 · CABA</span>

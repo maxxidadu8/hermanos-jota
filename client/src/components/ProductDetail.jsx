@@ -1,22 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProductImage from "./ProductImage.jsx";
 import { formatearPrecio, describirStock } from "../utils/productos.js";
 
-function ProductDetail({ producto, onVolver, onAgregar }) {
+function ProductDetail({ producto, onAgregar }) {
+  const navigate = useNavigate();
   const [agregado, setAgregado] = useState(false);
 
   return (
     <main id="contenido" className="section">
-      <a
-        className="back-link"
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          onVolver();
-        }}
-      >
+      <button type="button" className="back-link" onClick={() => navigate("/productos")}>
         ← Volver al catálogo
-      </a>
+      </button>
       <article className="product-detail">
         <ProductImage
           className="product-detail__image"

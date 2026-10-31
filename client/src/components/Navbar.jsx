@@ -1,26 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 const enlaces = [
-  { vista: "inicio", texto: "Inicio" },
-  { vista: "catalogo", texto: "Catálogo" },
-  { vista: "contacto", texto: "Contacto" },
+  { ruta: "/", texto: "Inicio" },
+  { ruta: "/productos", texto: "Catálogo" },
+  { ruta: "/contacto", texto: "Contacto" },
 ];
 
-function Navbar({ cantidadCarrito, onNavegar, onAbrirCarrito }) {
+function Navbar({ cantidadCarrito, onAbrirCarrito }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
-  const irA = (e, vista) => {
-    e.preventDefault();
-    setMenuAbierto(false);
-    onNavegar(vista);
-  };
+  const { pathname } = useLocation();
+  useEffect(() => { setMenuAbierto(false); }, [pathname]);
 
   return (
     <header className="site-header">
-      <a className="brand" href="#" onClick={(e) => irA(e, "inicio")}>
+      <Link className="brand" to="/" onClick={() => setMenuAbierto(false)}>
         <img src="/assets/img/logo.svg" alt="" />
         <span>Hermanos Jota</span>
-      </a>
+      </Link>
       <button
         type="button"
         className="menu-toggle"
@@ -37,9 +35,9 @@ function Navbar({ cantidadCarrito, onNavegar, onAbrirCarrito }) {
         aria-label="Principal"
       >
         {enlaces.map((enlace) => (
-          <a key={enlace.vista} href="#" onClick={(e) => irA(e, enlace.vista)}>
+          <NavLink key={enlace.ruta} to={enlace.ruta} end onClick={() => setMenuAbierto(false)}>
             {enlace.texto}
-          </a>
+          </NavLink>
         ))}
         <button
           type="button"

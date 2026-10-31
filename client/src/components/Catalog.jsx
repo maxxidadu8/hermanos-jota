@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ProductList from "./ProductList.jsx";
 
-function Catalog({ productos, cargando, error, onReintentar, onVerDetalle }) {
+function Catalog({ productos, cargando, error, onReintentar }) {
   const [busqueda, setBusqueda] = useState("");
 
   const texto = busqueda.trim().toLowerCase();
@@ -36,7 +36,6 @@ function Catalog({ productos, cargando, error, onReintentar, onVerDetalle }) {
         cargando={cargando}
         error={error}
         onReintentar={onReintentar}
-        onVerDetalle={onVerDetalle}
         mensajeVacio={productos.length === 0 ? "Todavía no hay productos en el catálogo." : "No encontramos productos con esa búsqueda."}
       />
     </main>

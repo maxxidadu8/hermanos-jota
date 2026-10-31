@@ -1,7 +1,8 @@
+import { Link } from "react-router-dom";
 import ProductImage from "./ProductImage.jsx";
 import { formatearPrecio, describirStock } from "../utils/productos.js";
 
-function ProductCard({ producto, onVerDetalle }) {
+function ProductCard({ producto }) {
   return (
     <article className="product-card">
       <ProductImage
@@ -16,15 +17,9 @@ function ProductCard({ producto, onVerDetalle }) {
         <p>{producto.descripcion}</p>
         <p className="price-note">{formatearPrecio(producto.precio)}</p>
         <p>{describirStock(producto.stock)}</p>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onVerDetalle(producto);
-          }}
-        >
+        <Link to={`/productos/${producto._id}`}>
           Ver pieza <span aria-hidden="true">→</span>
-        </a>
+        </Link>
       </div>
     </article>
   );

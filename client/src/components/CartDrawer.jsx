@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import ProductImage from "./ProductImage.jsx";
 import { formatearPrecio } from "../utils/productos.js";
 
@@ -9,7 +10,6 @@ function CartDrawer({
   onCambiarCantidad,
   onQuitar,
   onVaciar,
-  onNavegar,
 }) {
   useEffect(() => {
     const cerrarConEscape = (e) => {
@@ -18,11 +18,6 @@ function CartDrawer({
     document.addEventListener("keydown", cerrarConEscape);
     return () => document.removeEventListener("keydown", cerrarConEscape);
   }, [onCerrar]);
-
-  const irA = (e, vista) => {
-    e.preventDefault();
-    onNavegar(vista);
-  };
 
   return (
     <>
@@ -51,9 +46,9 @@ function CartDrawer({
           {carrito.length === 0 ? (
             <div className="cart-empty">
               <p>Todavía no hay piezas en tu pedido.</p>
-              <a className="text-link" href="#" onClick={(e) => irA(e, "catalogo")}>
+              <Link className="text-link" to="/productos" onClick={onCerrar}>
                 Ver el catálogo
-              </a>
+              </Link>
             </div>
           ) : (
             carrito.map(({ producto, cantidad }) => (
@@ -104,9 +99,9 @@ function CartDrawer({
                 <button type="button" className="button button--ghost" onClick={onVaciar}>
                   Vaciar
                 </button>
-                <a className="button" href="#" onClick={(e) => irA(e, "contacto")}>
+                <Link className="button" to="/contacto" onClick={onCerrar}>
                   Solicitar consulta
-                </a>
+                </Link>
               </div>
             </>
           )}

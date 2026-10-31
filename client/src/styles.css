@@ -193,6 +193,15 @@
     display: inline-block;
     margin-bottom: 2.5rem;
   }
+  button.back-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  .nav a[aria-current="page"] {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
   /* ==========================================================================
      Page sections
      ========================================================================== */
