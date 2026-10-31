@@ -7,11 +7,13 @@ import Catalog from "./components/Catalog.jsx";
 import ProductPage from "./components/ProductPage.jsx";
 import ContactForm from "./components/ContactForm.jsx";
 import CartDrawer from "./components/CartDrawer.jsx";
+import CreateProductPage from "./components/CreateProductPage.jsx";
 
 const titulos = {
   "/": "Hermanos Jota | Muebles con historia",
   "/productos": "Catálogo | Hermanos Jota",
   "/contacto": "Contacto | Hermanos Jota",
+  "/admin/crear-producto": "Crear producto | Hermanos Jota",
 };
 
 function App() {
@@ -114,6 +116,7 @@ function App() {
         } />
         <Route path="/productos/:id" element={<ProductPage onAgregar={agregarAlCarrito} />} />
         <Route path="/contacto" element={<ContactForm />} />
+        <Route path="/admin/crear-producto" element={<CreateProductPage onCreado={reintentar} />} />
         <Route path="*" element={
           <main id="contenido" className="section">
             <h1>Página no encontrada</h1>

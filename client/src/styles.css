@@ -683,6 +683,21 @@ button {
 }
 
 /* Agregados para la versión en React. */
+.product-editor {
+  max-width: 760px;
+}
+.product-fields {
+  display: grid;
+  gap: 1.25rem;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.field-help {
+  font-size: 0.875rem;
+  color: #665650;
+}
 .estado {
   padding: 2rem 0;
   color: #665650;

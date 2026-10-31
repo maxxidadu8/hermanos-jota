@@ -51,15 +51,25 @@ simulado: muestra el total, pero no reserva ni descuenta stock en MongoDB.
 | `/productos` | Catálogo |
 | `/productos/:id` | Detalle, con `useParams` y consulta a la API por `_id` |
 | `/contacto` | Formulario de contacto |
+| `/admin/crear-producto` | Formulario controlado de alta de productos |
 | Cualquier otra | Página no encontrada |
 
 El detalle permite acceso directo y recarga, muestra carga y errores y permite
 reintentar. El botón para volver al catálogo utiliza `useNavigate`. Los enlaces
 permiten abrir páginas en otra pestaña y usar Atrás/Adelante del navegador.
 
-La ruta `/admin/crear-producto` y su formulario se incorporarán en el próximo
-paso, junto con la navegación después de guardar. Edición y eliminación desde
-React también están pendientes.
+El enlace «Crear producto» del menú abre un formulario con los cinco campos del
+modelo. Nombre y precio son obligatorios; descripción, stock e imagen son
+opcionales. El precio admite cero y hasta dos decimales; el stock, cuando se
+indica, debe ser un entero no negativo. Una imagen puede ser una URL completa o
+una ruta local.
+
+Al guardar, el formulario envía JSON a `POST /api/productos`. Mientras espera la
+respuesta, bloquea los campos y el botón para evitar envíos repetidos. Si ocurre
+un error, conserva los datos y muestra un mensaje. Si recibe `201`, actualiza el
+catálogo y redirige con `useNavigate` al detalle del nuevo `_id`.
+
+Edición y eliminación de productos desde React están pendientes.
 
 Para publicar con `BrowserRouter`, el hosting del frontend deberá devolver
 `index.html` para las rutas de la aplicación. Esa configuración se agregará en

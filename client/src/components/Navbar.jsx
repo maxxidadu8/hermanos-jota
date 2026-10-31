@@ -5,6 +5,7 @@ const enlaces = [
   { ruta: "/", texto: "Inicio" },
   { ruta: "/productos", texto: "Catálogo" },
   { ruta: "/contacto", texto: "Contacto" },
+  { ruta: "/admin/crear-producto", texto: "Crear producto" },
 ];
 
 function Navbar({ cantidadCarrito, onAbrirCarrito }) {
