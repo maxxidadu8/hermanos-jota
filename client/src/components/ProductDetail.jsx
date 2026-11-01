@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProductImage from "./ProductImage.jsx";
 import { formatearPrecio, describirStock } from "../utils/productos.js";
 
@@ -40,6 +40,9 @@ function ProductDetail({ producto, onAgregar }) {
           <p className="form-message" aria-live="polite">
             {agregado && "La pieza fue añadida al carrito."}
           </p>
+          <div className="product-admin-actions">
+            <Link className="button button--ghost" to={`/admin/editar-producto/${producto._id}`}>Editar producto</Link>
+          </div>
         </div>
       </article>
     </main>

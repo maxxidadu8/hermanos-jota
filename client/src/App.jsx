@@ -8,6 +8,7 @@ import ProductPage from "./components/ProductPage.jsx";
 import ContactForm from "./components/ContactForm.jsx";
 import CartDrawer from "./components/CartDrawer.jsx";
 import CreateProductPage from "./components/CreateProductPage.jsx";
+import EditProductPage from "./components/EditProductPage.jsx";
 
 const titulos = {
   "/": "Hermanos Jota | Muebles con historia",
@@ -58,7 +59,9 @@ function App() {
     document.title = titulos[pathname] ?? (
       /^\/productos\/[^/]+\/?$/.test(pathname)
         ? "Producto | Hermanos Jota"
-        : "Página no encontrada | Hermanos Jota"
+        : /^\/admin\/editar-producto\/[^/]+\/?$/.test(pathname)
+          ? "Editar producto | Hermanos Jota"
+          : "Página no encontrada | Hermanos Jota"
     );
     setCarritoAbierto(false);
     window.scrollTo(0, 0);
@@ -98,6 +101,12 @@ function App() {
 
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
   const reintentar = () => setIntento((n) => n + 1);
+  const actualizarProducto = (producto) => {
+    setCarrito(actual => actual.map(item => item.producto._id === producto._id
+      ? { ...item, producto }
+      : item));
+    reintentar();
+  };
 
   return (
     <>
@@ -117,6 +126,7 @@ function App() {
         <Route path="/productos/:id" element={<ProductPage onAgregar={agregarAlCarrito} />} />
         <Route path="/contacto" element={<ContactForm />} />
         <Route path="/admin/crear-producto" element={<CreateProductPage onCreado={reintentar} />} />
+        <Route path="/admin/editar-producto/:id" element={<EditProductPage onActualizado={actualizarProducto} />} />
         <Route path="*" element={
           <main id="contenido" className="section">
             <h1>Página no encontrada</h1>

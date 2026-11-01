@@ -686,6 +686,12 @@ button {
 .product-editor {
   max-width: 760px;
 }
+.product-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
 .product-fields {
   display: grid;
   gap: 1.25rem;

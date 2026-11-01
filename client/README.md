@@ -52,6 +52,7 @@ simulado: muestra el total, pero no reserva ni descuenta stock en MongoDB.
 | `/productos/:id` | Detalle, con `useParams` y consulta a la API por `_id` |
 | `/contacto` | Formulario de contacto |
 | `/admin/crear-producto` | Formulario controlado de alta de productos |
+| `/admin/editar-producto/:id` | Formulario precargado de edición |
 | Cualquier otra | Página no encontrada |
 
 El detalle permite acceso directo y recarga, muestra carga y errores y permite
@@ -69,7 +70,14 @@ respuesta, bloquea los campos y el botón para evitar envíos repetidos. Si ocur
 un error, conserva los datos y muestra un mensaje. Si recibe `201`, actualiza el
 catálogo y redirige con `useNavigate` al detalle del nuevo `_id`.
 
-Edición y eliminación de productos desde React están pendientes.
+El detalle incluye un enlace «Editar producto». La página de edición obtiene
+el producto mediante GET y precarga el formulario compartido `ProductForm`.
+Guardar envía PUT, actualiza el catálogo y los datos del carrito, y redirige al
+detalle con `useNavigate`. Cancelar vuelve al detalle sin guardar. Si se deja el
+stock vacío durante la edición, se guarda como `null` (stock a consultar).
+La carga maneja IDs inválidos, productos inexistentes y errores de conexión.
+
+La eliminación de productos desde React está pendiente.
 
 Para publicar con `BrowserRouter`, el hosting del frontend deberá devolver
 `index.html` para las rutas de la aplicación. Esa configuración se agregará en
