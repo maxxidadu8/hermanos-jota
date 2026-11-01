@@ -4,8 +4,9 @@
 
 - Frontend: https://hermanos-jota-mu.vercel.app/
 - Backend: https://hermanos-jota-ja99.onrender.com
+- API de productos: https://hermanos-jota-ja99.onrender.com/api/productos
 
-## Aplicación React y API (tercera entrega en curso)
+## Aplicación React y API (tercera entrega)
 
 La aplicación actual se organiza en `client` (React y Vite) y `backend`
 (Express, Mongoose y MongoDB Atlas). Requiere Node.js 22.12.0 o superior.
