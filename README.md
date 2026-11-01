@@ -16,6 +16,10 @@ Router. El alta, la edición y la eliminación de productos ya están implementa
 desde React. La eliminación requiere confirmación. Ver el estado en
 [client/README.md](client/README.md).
 
+Para cargar los 11 muebles originales en MongoDB, ejecutar `npm run seed` desde
+`backend`. Sus precios y stock son datos ficticios de demostración; la carga no
+sobrescribe los productos existentes. Ver [backend/README.md](backend/README.md).
+
 Los HTML y archivos de la raíz descritos debajo corresponden al sitio original.
 
 Sitio estático para la mueblería Hermanos Jota. Incluye inicio, catálogo con búsqueda, detalle de producto, carrito simulado y formulario de contacto con validación del lado del cliente.

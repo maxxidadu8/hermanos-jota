@@ -33,9 +33,8 @@ mensaje sin exponer credenciales. La selección del servidor tiene un tiempo
 máximo de 10 segundos.
 
 Los endpoints GET consultan MongoDB mediante el modelo `Product`. El array de
-`data/productos.js` queda como referencia del catálogo anterior y ya no se usa
-para responder estas peticiones. Una base sin productos devuelve `[]`; todavía
-no se migraron los productos del catálogo anterior.
+`data/productos.js` es la fuente del script de carga inicial y no se usa para
+responder estas peticiones. Una base sin productos devuelve `[]`.
 
 ## Modelo Product
 
@@ -157,7 +156,9 @@ ejecutar el controlador de creación.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
 - `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
 - `middlewares/errorHandler.js`: centraliza las respuestas de error en JSON.
-- `data/productos.js`: referencia del catálogo anterior, sin uso en los endpoints GET.
+- `data/productos.js`: catálogo original, fuente de la carga inicial.
+- `data/productosIniciales.js`: transforma el catálogo al modelo actual y asigna valores de ejemplo.
+- `scripts/cargarCatalogo.js`: inserta las piezas iniciales sin sobrescribir las existentes.
 
 ## Pruebas locales
 
@@ -204,3 +205,30 @@ curl -i -X DELETE http://localhost:3001/api/productos/507f1f77bcf86cd799439011
 La respuesta debe ser `204`, sin JSON. Un GET posterior al mismo ID devuelve
 `404`, y el producto deja de aparecer en el listado. Repetir DELETE sobre ese ID
 también devuelve `404`.
+
+## Carga del catálogo original
+
+Con `MONGODB_URI` configurada en `backend/.env`, ejecutar desde `backend`:
+
+```bash
+npm run seed
+```
+
+Carga los 11 muebles originales con nombre, descripción e imagen, más precios
+y stock **ficticios para la entrega**. No son precios comerciales ni inventario
+real. Los valores se definen en `data/productosIniciales.js` y se pueden editar
+después desde React. Sillón Copacabana tiene stock cero para demostrar el estado
+sin disponibilidad. La consigna no establece importes ni cantidades concretas.
+
+Cada pieza inicial tiene un `_id` estable derivado de su identificador original.
+La carga utiliza `$setOnInsert`: repetirla no duplica esas piezas ni cambia sus
+campos, aunque se hayan editado o renombrado desde la aplicación. Tampoco borra
+ni modifica otros productos, como los creados para probar el CRUD. Si se elimina
+una pieza inicial y se ejecuta nuevamente el script, esa pieza se vuelve a crear.
+Los productos creados manualmente con otro `_id` se consideran independientes,
+aunque tengan el mismo nombre.
+
+El comando muestra cuántos productos creó y cuántos ya existían, y cierra la
+conexión al terminar. Si la conexión falla a mitad de la carga, se puede volver
+a ejecutar para completar las piezas restantes. No se ejecuta al iniciar el
+servidor: la carga se realiza únicamente con este comando.

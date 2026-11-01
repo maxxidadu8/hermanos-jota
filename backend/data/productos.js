@@ -155,5 +155,5 @@ const productos = [
   },
 ];
 
-// Permite importar el catálogo desde las rutas del backend.
+// Catálogo original utilizado como fuente para el script de carga inicial.
 module.exports = productos;
