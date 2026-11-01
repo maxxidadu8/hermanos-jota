@@ -193,6 +193,15 @@
     display: inline-block;
     margin-bottom: 2.5rem;
   }
+  button.back-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  .nav a[aria-current="page"] {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
   /* ==========================================================================
      Page sections
      ========================================================================== */
@@ -567,6 +576,11 @@ button {
   }
 }
 /* Panel del carrito ya presente en el sitio. */
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .cart-open {
   overflow: hidden;
 }
@@ -669,6 +683,48 @@ button {
 }
 
 /* Agregados para la versión en React. */
+.product-editor {
+  max-width: 760px;
+}
+.product-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.button--danger {
+  background: #8c2929;
+  border-color: #8c2929;
+  color: white;
+}
+.button--danger:hover,
+.button--danger:focus-visible {
+  background: #6f1f1f;
+  color: white;
+}
+.delete-dialog {
+  width: min(520px, calc(100% - 2rem));
+  border: 0;
+  border-radius: 8px;
+  padding: 2rem;
+  color: var(--siena);
+  background: var(--blanco);
+}
+.delete-dialog::backdrop {
+  background: #0008;
+}
+.product-fields {
+  display: grid;
+  gap: 1.25rem;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.field-help {
+  font-size: 0.875rem;
+  color: #665650;
+}
 .estado {
   padding: 2rem 0;
   color: #665650;

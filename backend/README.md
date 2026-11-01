@@ -8,8 +8,49 @@ Desde esta carpeta:
 
 ```bash
 npm install
+cp .env.example .env
+```
+
+Editar `backend/.env` y reemplazar el ejemplo de `MONGODB_URI` por la cadena de
+conexión de MongoDB Atlas, incluyendo el nombre de la base `hermanos-jota`.
+En Atlas, crear un usuario de base de datos y permitir la IP desde la que se
+ejecutará la API. Si la contraseña contiene caracteres especiales, deben estar
+codificados para una URL en la cadena de conexión.
+
+El archivo `.env` contiene credenciales y está excluido de Git. Solo se versiona
+`.env.example`, que contiene valores de ejemplo. Las variables configuradas en
+el entorno de ejecución tienen prioridad sobre las del archivo.
+
+Después de configurar la conexión:
+
+```bash
 npm start
 ```
+
+La API espera a que Mongoose se conecte a MongoDB antes de escuchar peticiones.
+Si falta la URI o la conexión falla, termina con código de error y muestra un
+mensaje sin exponer credenciales. La selección del servidor tiene un tiempo
+máximo de 10 segundos.
+
+Los endpoints GET consultan MongoDB mediante el modelo `Product`. El array de
+`data/productos.js` es la fuente del script de carga inicial y no se usa para
+responder estas peticiones. Una base sin productos devuelve `[]`.
+
+## Modelo Product
+
+El modelo se define en `models/Product.js` mediante un esquema de Mongoose:
+
+| Campo | Tipo | Obligatorio |
+| --- | --- | --- |
+| `nombre` | String | Sí |
+| `descripcion` | String | No |
+| `precio` | Number | Sí |
+| `stock` | Number | No |
+| `imagenUrl` | String | No |
+
+Mongoose genera automáticamente un `_id` para cada producto. El precio `0` es
+válido: obligatorio significa que el campo debe estar presente, sin establecer
+un precio mínimo en esta etapa.
 
 El servidor utiliza el puerto `3001` por defecto. Se puede cambiar con la variable
 de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
@@ -17,11 +58,26 @@ de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar
 
 ## Rutas
 
+- `DELETE /api/productos/:id`: elimina el producto por `_id` y devuelve `204`
+  sin cuerpo. Responde `400` si el ID tiene formato inválido y `404` si el
+  producto no existe o ya fue eliminado.
+
+- `PUT /api/productos/:id`: actualiza los campos enviados y conserva los omitidos.
+  Devuelve `200` con el producto actualizado, `400` por ID o datos inválidos y
+  `404` si el producto no existe. Valida el documento antes de guardarlo.
+  Solo admite los cinco campos del modelo; no permite cambiar `_id`. Un cuerpo
+  sin campos permitidos se rechaza con `400`.
+
+- `POST /api/productos`: crea un producto en MongoDB y responde `201` con el
+  documento guardado, incluido su `_id`. Solo acepta los cinco campos del modelo.
+  Si el cuerpo no es un objeto o falla la validación de Mongoose, responde `400`.
+
 - `GET /api/productos`: responde con estado `200` y el array completo de productos
-  en formato JSON, tomado de `data/productos.js`.
+  en formato JSON, consultado con `Product.find()` en MongoDB.
 - `GET /api/productos/:id`: responde con estado `200` y el objeto del producto
-  cuyo ID coincide con el solicitado. Si no existe, responde con estado `404`
-  y el JSON `{ "error": "Producto no encontrado" }`.
+  cuyo `_id` coincide con el solicitado, consultado con `Product.findById()`.
+  Si el ID tiene formato inválido, responde `400`. Si tiene formato válido pero
+  no existe, responde `404` y `{ "error": "Producto no encontrado" }`.
 
 Para comprobar la respuesta, abrir `http://localhost:3001/api/productos` en el
 navegador o ejecutar:
@@ -33,11 +89,13 @@ curl http://localhost:3001/api/productos
 Ejemplos de búsqueda por ID:
 
 ```bash
-curl -i http://localhost:3001/api/productos/butaca-mendoza
+# Reemplazar el ID de ejemplo por un _id obtenido del listado.
+curl -i http://localhost:3001/api/productos/507f1f77bcf86cd799439011
 curl -i http://localhost:3001/api/productos/no-existe
 ```
 
-Los IDs son textos como `butaca-mendoza`, no números. Si se ejecuta el servidor
+Los IDs son ObjectId de MongoDB, representados por 24 caracteres hexadecimales.
+Los identificadores anteriores como `butaca-mendoza` ya no son válidos. Si se ejecuta el servidor
 con `npm start`, hay que detenerlo con `Ctrl + C` y volver a iniciarlo después de
 editar el código.
 
@@ -48,7 +106,7 @@ en la terminal del servidor, incluyendo rutas inexistentes y parámetros de cons
 
 ```text
 GET /api/productos
-GET /api/productos/butaca-mendoza
+GET /api/productos/507f1f77bcf86cd799439011
 GET /api/productos/no-existe
 ```
 
@@ -58,10 +116,7 @@ Se monta antes de las rutas y llama a `next()` para continuar el procesamiento.
 
 El middleware global `express.json()` se monta antes de las rutas. Cuando una
 petición envía `Content-Type: application/json`, convierte su cuerpo JSON en un
-objeto disponible en `req.body` para las futuras rutas POST.
-
-Este middleware prepara la lectura del cuerpo; las rutas POST se implementarán
-cuando corresponda.
+objeto disponible en `req.body` para crear productos mediante POST.
 
 ## Respuestas de error
 
@@ -70,6 +125,8 @@ el manejador centralizado de errores. Las rutas pueden enviar un error a este
 último con `next(error)`.
 
 - Ruta inexistente: `404` y `{ "error": "Ruta no encontrada" }`.
+- Datos de creación o actualización inválidos: `400` con un mensaje de validación.
+- ID inválido: `400` y `{ "error": "ID de producto inválido" }`.
 - Producto inexistente: `404` y `{ "error": "Producto no encontrado" }`.
 - Cuerpo JSON inválido: `400` y `{ "error": "JSON inválido en el cuerpo de la petición" }`.
 - Error interno: `500` y `{ "error": "Error interno del servidor" }`. El detalle
@@ -84,17 +141,94 @@ curl -i http://localhost:3001/api/productos/no-existe
 curl -i -X POST http://localhost:3001/api/productos -H 'Content-Type: application/json' -d '{"nombre":'
 ```
 
-La última petición comprueba el procesamiento del JSON antes de las rutas,
-aunque todavía no haya una ruta POST permanente.
+La última petición comprueba que un cuerpo JSON mal formado se rechaza antes de
+ejecutar el controlador de creación.
 
 ## Organización
 
 - `app.js`: configura Express y monta las rutas.
-- `server.js`: inicia el servidor HTTP.
+- `server.js`: carga las variables de entorno y conecta la base antes de iniciar el servidor HTTP.
+- `config/db.js`: establece la conexión con MongoDB mediante Mongoose.
+- `models/Product.js`: define el esquema y el modelo de productos.
 - `routes/productos.js`: define las rutas mediante `express.Router`.
-- `controllers/productosController.js`: lista los productos y busca por ID;
+- `controllers/productosController.js`: lista, busca por ID, crea, actualiza y elimina productos;
   envía los errores al manejador centralizado mediante `next(error)`.
 - `middlewares/logger.js`: registra el método y la URL de todas las peticiones.
 - `middlewares/notFound.js`: envía un error 404 cuando ninguna ruta coincide.
 - `middlewares/errorHandler.js`: centraliza las respuestas de error en JSON.
-- `data/productos.js`: contiene los datos locales del catálogo.
+- `data/productos.js`: catálogo original, fuente de la carga inicial.
+- `data/productosIniciales.js`: transforma el catálogo al modelo actual y asigna valores de ejemplo.
+- `scripts/cargarCatalogo.js`: inserta las piezas iniciales sin sobrescribir las existentes.
+
+## Pruebas locales
+
+Desde `backend`, ejecutar `npm test`. Las pruebas verifican las consultas y el
+manejo de errores con respuestas simuladas del modelo; no requieren Atlas ni
+sustituyen una prueba real de conexión y consulta a MongoDB.
+
+## Crear un producto
+
+Con la API iniciada, desde otra terminal:
+
+```bash
+curl -i -X POST http://localhost:3001/api/productos \
+  -H 'Content-Type: application/json' \
+  -d '{"nombre":"Mesa de prueba","descripcion":"Producto de prueba","precio":1000,"stock":2,"imagenUrl":""}'
+```
+
+Esta petición guarda un producto real en la base configurada. La respuesta debe
+ser `201`. Consultar `GET /api/productos` permite comprobar que quedó guardado.
+Los cinco endpoints del CRUD están implementados.
+
+## Actualizar un producto
+
+Reemplazar el ID de ejemplo por el `_id` de un producto existente:
+
+```bash
+curl -i -X PUT http://localhost:3001/api/productos/507f1f77bcf86cd799439011 \
+  -H 'Content-Type: application/json' \
+  -d '{"precio":1500,"stock":3}'
+```
+
+La respuesta debe ser `200` con el producto actualizado. Consultar luego el
+mismo ID mediante GET permite comprobar que los cambios quedaron guardados.
+
+## Eliminar un producto
+
+Reemplazar el ID de ejemplo por el `_id` del producto que se quiere eliminar.
+Esta operación borra el producto de la base configurada:
+
+```bash
+curl -i -X DELETE http://localhost:3001/api/productos/507f1f77bcf86cd799439011
+```
+
+La respuesta debe ser `204`, sin JSON. Un GET posterior al mismo ID devuelve
+`404`, y el producto deja de aparecer en el listado. Repetir DELETE sobre ese ID
+también devuelve `404`.
+
+## Carga del catálogo original
+
+Con `MONGODB_URI` configurada en `backend/.env`, ejecutar desde `backend`:
+
+```bash
+npm run seed
+```
+
+Carga los 11 muebles originales con nombre, descripción e imagen, más precios
+y stock **ficticios para la entrega**. No son precios comerciales ni inventario
+real. Los valores se definen en `data/productosIniciales.js` y se pueden editar
+después desde React. Sillón Copacabana tiene stock cero para demostrar el estado
+sin disponibilidad. La consigna no establece importes ni cantidades concretas.
+
+Cada pieza inicial tiene un `_id` estable derivado de su identificador original.
+La carga utiliza `$setOnInsert`: repetirla no duplica esas piezas ni cambia sus
+campos, aunque se hayan editado o renombrado desde la aplicación. Tampoco borra
+ni modifica otros productos, como los creados para probar el CRUD. Si se elimina
+una pieza inicial y se ejecuta nuevamente el script, esa pieza se vuelve a crear.
+Los productos creados manualmente con otro `_id` se consideran independientes,
+aunque tengan el mismo nombre.
+
+El comando muestra cuántos productos creó y cuántos ya existían, y cierra la
+conexión al terminar. Si la conexión falla a mitad de la carga, se puede volver
+a ejecutar para completar las piezas restantes. No se ejecuta al iniciar el
+servidor: la carga se realiza únicamente con este comando.

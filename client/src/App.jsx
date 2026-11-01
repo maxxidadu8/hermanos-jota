@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import Home from "./components/Home.jsx";
 import Catalog from "./components/Catalog.jsx";
-import ProductDetail from "./components/ProductDetail.jsx";
+import ProductPage from "./components/ProductPage.jsx";
 import ContactForm from "./components/ContactForm.jsx";
 import CartDrawer from "./components/CartDrawer.jsx";
+import CreateProductPage from "./components/CreateProductPage.jsx";
+import EditProductPage from "./components/EditProductPage.jsx";
 
-// Mismos títulos que tenía cada página del sitio original.
 const titulos = {
-  inicio: "Hermanos Jota | Muebles con historia",
-  catalogo: "Catálogo | Hermanos Jota",
-  detalle: "Producto | Hermanos Jota",
-  contacto: "Contacto | Hermanos Jota",
+  "/": "Hermanos Jota | Muebles con historia",
+  "/productos": "Catálogo | Hermanos Jota",
+  "/contacto": "Contacto | Hermanos Jota",
+  "/admin/crear-producto": "Crear producto | Hermanos Jota",
 };
 
 function App() {
-  // Vista actual: "inicio", "catalogo", "detalle" o "contacto".
-  const [vista, setVista] = useState("inicio");
-  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const { pathname } = useLocation();
 
   // Ciclo de vida de la petición al backend.
   const [productos, setProductos] = useState([]);
@@ -40,6 +40,7 @@ function App() {
         return res.json();
       })
       .then((datos) => {
+        if (!Array.isArray(datos)) throw new Error("El catálogo recibido no es una lista");
         if (!cancelado) setProductos(datos);
       })
       .catch(() => {
@@ -55,29 +56,26 @@ function App() {
   }, [intento]);
 
   useEffect(() => {
-    document.title = titulos[vista];
-  }, [vista]);
+    document.title = titulos[pathname] ?? (
+      /^\/productos\/[^/]+\/?$/.test(pathname)
+        ? "Producto | Hermanos Jota"
+        : /^\/admin\/editar-producto\/[^/]+\/?$/.test(pathname)
+          ? "Editar producto | Hermanos Jota"
+          : "Página no encontrada | Hermanos Jota"
+    );
+    setCarritoAbierto(false);
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     document.body.classList.toggle("cart-open", carritoAbierto);
   }, [carritoAbierto]);
 
-  const navegar = (nuevaVista) => {
-    setVista(nuevaVista);
-    setCarritoAbierto(false);
-    window.scrollTo(0, 0);
-  };
-
-  const verDetalle = (producto) => {
-    setProductoSeleccionado(producto);
-    navegar("detalle");
-  };
-
   const agregarAlCarrito = (producto) => {
     setCarrito((actual) =>
-      actual.some((item) => item.producto.id === producto.id)
+      actual.some((item) => item.producto._id === producto._id)
         ? actual.map((item) =>
-            item.producto.id === producto.id
+            item.producto._id === producto._id
               ? { ...item, cantidad: item.cantidad + 1 }
               : item,
           )
@@ -89,7 +87,7 @@ function App() {
     setCarrito((actual) =>
       actual
         .map((item) =>
-          item.producto.id === id
+          item.producto._id === id
             ? { ...item, cantidad: item.cantidad + cambio }
             : item,
         )
@@ -98,50 +96,52 @@ function App() {
   };
 
   const quitarDelCarrito = (id) => {
-    setCarrito((actual) => actual.filter((item) => item.producto.id !== id));
+    setCarrito((actual) => actual.filter((item) => item.producto._id !== id));
   };
 
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
   const reintentar = () => setIntento((n) => n + 1);
+  const actualizarProducto = (producto) => {
+    setCarrito(actual => actual.map(item => item.producto._id === producto._id
+      ? { ...item, producto }
+      : item));
+    reintentar();
+  };
+  const eliminarProducto = (id) => {
+    setProductos(actual => actual.filter(producto => producto._id !== id));
+    setCarrito(actual => actual.filter(item => item.producto._id !== id));
+    reintentar();
+  };
 
   return (
     <>
       <a className="skip-link" href="#contenido">Saltar al contenido</a>
       <Navbar
         cantidadCarrito={cantidadCarrito}
-        onNavegar={navegar}
         onAbrirCarrito={() => setCarritoAbierto(true)}
       />
 
-      {vista === "inicio" && (
-        <Home
-          productos={productos}
-          cargando={cargando}
-          error={error}
-          onReintentar={reintentar}
-          onVerDetalle={verDetalle}
-          onNavegar={navegar}
-        />
-      )}
-      {vista === "catalogo" && (
-        <Catalog
-          productos={productos}
-          cargando={cargando}
-          error={error}
-          onReintentar={reintentar}
-          onVerDetalle={verDetalle}
-        />
-      )}
-      {vista === "detalle" && productoSeleccionado && (
-        <ProductDetail
-          producto={productoSeleccionado}
-          onVolver={() => navegar("catalogo")}
-          onAgregar={agregarAlCarrito}
-        />
-      )}
-      {vista === "contacto" && <ContactForm />}
+      <Routes>
+        <Route path="/" element={
+          <Home productos={productos} cargando={cargando} error={error} onReintentar={reintentar} />
+        } />
+        <Route path="/productos" element={
+          <Catalog productos={productos} cargando={cargando} error={error} onReintentar={reintentar} />
+        } />
+        <Route path="/productos/:id" element={<ProductPage onAgregar={agregarAlCarrito} onEliminado={eliminarProducto} />} />
+        <Route path="/contacto" element={<ContactForm />} />
+        <Route path="/admin/crear-producto" element={<CreateProductPage onCreado={reintentar} />} />
+        <Route path="/admin/editar-producto/:id" element={<EditProductPage onActualizado={actualizarProducto} />} />
+        <Route path="*" element={
+          <main id="contenido" className="section">
+            <h1>Página no encontrada</h1>
+            <p>La dirección que buscás no existe.</p>
+            <Link className="button" to="/">Volver al inicio</Link>
+          </main>
+        } />
+      </Routes>
 
-      <Footer onNavegar={navegar} />
+      <Footer />
 
       {carritoAbierto && (
         <CartDrawer
@@ -151,7 +151,6 @@ function App() {
           onCambiarCantidad={cambiarCantidad}
           onQuitar={quitarDelCarrito}
           onVaciar={() => setCarrito([])}
-          onNavegar={navegar}
         />
       )}
     </>

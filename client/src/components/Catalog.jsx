@@ -1,12 +1,14 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import ProductList from "./ProductList.jsx";
 
-function Catalog({ productos, cargando, error, onReintentar, onVerDetalle }) {
+function Catalog({ productos, cargando, error, onReintentar }) {
+  const { state } = useLocation();
   const [busqueda, setBusqueda] = useState("");
 
   const texto = busqueda.trim().toLowerCase();
   const filtrados = productos.filter((p) =>
-    (p.nombre + p.descripcion + Object.values(p.detalles).join(" "))
+    [p.nombre, p.descripcion ?? ""].join(" ")
       .toLowerCase()
       .includes(texto),
   );
@@ -15,6 +17,7 @@ function Catalog({ productos, cargando, error, onReintentar, onVerDetalle }) {
     <main id="contenido" className="section catalog">
       <p className="eyebrow">Colección completa</p>
       <h1>Hechos para quedarse.</h1>
+      {state?.aviso && <p role="status">{state.aviso}</p>}
       <p className="catalog__intro">
         Explorá nuestras piezas y encontrá esa que hará de tu casa un lugar más tuyo.
       </p>
@@ -36,7 +39,7 @@ function Catalog({ productos, cargando, error, onReintentar, onVerDetalle }) {
         cargando={cargando}
         error={error}
         onReintentar={onReintentar}
-        onVerDetalle={onVerDetalle}
+        mensajeVacio={productos.length === 0 ? "Todavía no hay productos en el catálogo." : "No encontramos productos con esa búsqueda."}
       />
     </main>
   );

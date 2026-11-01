@@ -1,6 +1,7 @@
+import { Link } from "react-router-dom";
 import ProductList from "./ProductList.jsx";
 
-function Home({ productos, cargando, error, onReintentar, onVerDetalle, onNavegar }) {
+function Home({ productos, cargando, error, onReintentar }) {
   return (
     <main id="contenido">
       <section className="hero">
@@ -36,23 +37,15 @@ function Home({ productos, cargando, error, onReintentar, onVerDetalle, onNavega
             <p className="eyebrow">Selección</p>
             <h2>Piezas destacadas</h2>
           </div>
-          <a
-            className="text-link"
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              onNavegar("catalogo");
-            }}
-          >
+          <Link className="text-link" to="/productos">
             Ver todo el catálogo <span aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
         <ProductList
           productos={productos.slice(0, 4)}
           cargando={cargando}
           error={error}
           onReintentar={onReintentar}
-          onVerDetalle={onVerDetalle}
         />
       </section>
 

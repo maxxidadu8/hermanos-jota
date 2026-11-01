@@ -1,24 +1,22 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import ProductImage from "./ProductImage.jsx";
+import DeleteProductButton from "./DeleteProductButton.jsx";
+import { formatearPrecio, describirStock } from "../utils/productos.js";
 
-function ProductDetail({ producto, onVolver, onAgregar }) {
+function ProductDetail({ producto, onAgregar, onEliminado }) {
+  const navigate = useNavigate();
   const [agregado, setAgregado] = useState(false);
 
   return (
     <main id="contenido" className="section">
-      <a
-        className="back-link"
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          onVolver();
-        }}
-      >
+      <button type="button" className="back-link" onClick={() => navigate("/productos")}>
         ← Volver al catálogo
-      </a>
+      </button>
       <article className="product-detail">
-        <img
+        <ProductImage
           className="product-detail__image"
-          src={`/${producto.imagen}`}
+          imagenUrl={producto.imagenUrl}
           alt={producto.nombre}
           width="1024"
           height="1024"
@@ -27,18 +25,12 @@ function ProductDetail({ producto, onVolver, onAgregar }) {
           <p className="eyebrow">Pieza Hermanos Jota</p>
           <h1>{producto.nombre}</h1>
           <p className="product-detail__description">{producto.descripcion}</p>
-          <p className="price-note">Precio: a consultar</p>
-          <ul className="specs">
-            {Object.entries(producto.detalles).map(([clave, valor]) => (
-              <li key={clave}>
-                <strong>{clave}</strong>
-                <span>{valor}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="price-note">{formatearPrecio(producto.precio)}</p>
+          <p>{describirStock(producto.stock)}</p>
           <button
             type="button"
             className="button"
+            disabled={Number.isFinite(producto.stock) && producto.stock <= 0}
             onClick={() => {
               onAgregar(producto);
               setAgregado(true);
@@ -49,6 +41,10 @@ function ProductDetail({ producto, onVolver, onAgregar }) {
           <p className="form-message" aria-live="polite">
             {agregado && "La pieza fue añadida al carrito."}
           </p>
+          <div className="product-admin-actions">
+            <Link className="button button--ghost" to={`/admin/editar-producto/${producto._id}`}>Editar producto</Link>
+            <DeleteProductButton producto={producto} onEliminado={onEliminado} />
+          </div>
         </div>
       </article>
     </main>

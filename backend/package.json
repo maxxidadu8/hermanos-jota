@@ -5,6 +5,8 @@
   "description": "API de productos de Hermanos Jota",
   "main": "server.js",
   "scripts": {
+    "seed": "node scripts/cargarCatalogo.js",
+    "test": "node --test",
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
@@ -12,6 +14,8 @@
     "node": ">=18.11.0"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^18.0.9",
+    "express": "^5.2.1",
+    "mongoose": "^8.24.7"
   }
 }
