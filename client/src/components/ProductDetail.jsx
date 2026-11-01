@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProductImage from "./ProductImage.jsx";
+import DeleteProductButton from "./DeleteProductButton.jsx";
 import { formatearPrecio, describirStock } from "../utils/productos.js";
 
-function ProductDetail({ producto, onAgregar }) {
+function ProductDetail({ producto, onAgregar, onEliminado }) {
   const navigate = useNavigate();
   const [agregado, setAgregado] = useState(false);
 
@@ -42,6 +43,7 @@ function ProductDetail({ producto, onAgregar }) {
           </p>
           <div className="product-admin-actions">
             <Link className="button button--ghost" to={`/admin/editar-producto/${producto._id}`}>Editar producto</Link>
+            <DeleteProductButton producto={producto} onEliminado={onEliminado} />
           </div>
         </div>
       </article>

@@ -107,6 +107,11 @@ function App() {
       : item));
     reintentar();
   };
+  const eliminarProducto = (id) => {
+    setProductos(actual => actual.filter(producto => producto._id !== id));
+    setCarrito(actual => actual.filter(item => item.producto._id !== id));
+    reintentar();
+  };
 
   return (
     <>
@@ -123,7 +128,7 @@ function App() {
         <Route path="/productos" element={
           <Catalog productos={productos} cargando={cargando} error={error} onReintentar={reintentar} />
         } />
-        <Route path="/productos/:id" element={<ProductPage onAgregar={agregarAlCarrito} />} />
+        <Route path="/productos/:id" element={<ProductPage onAgregar={agregarAlCarrito} onEliminado={eliminarProducto} />} />
         <Route path="/contacto" element={<ContactForm />} />
         <Route path="/admin/crear-producto" element={<CreateProductPage onCreado={reintentar} />} />
         <Route path="/admin/editar-producto/:id" element={<EditProductPage onActualizado={actualizarProducto} />} />

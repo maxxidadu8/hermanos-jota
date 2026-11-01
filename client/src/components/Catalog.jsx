@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import ProductList from "./ProductList.jsx";
 
 function Catalog({ productos, cargando, error, onReintentar }) {
+  const { state } = useLocation();
   const [busqueda, setBusqueda] = useState("");
 
   const texto = busqueda.trim().toLowerCase();
@@ -15,6 +17,7 @@ function Catalog({ productos, cargando, error, onReintentar }) {
     <main id="contenido" className="section catalog">
       <p className="eyebrow">Colección completa</p>
       <h1>Hechos para quedarse.</h1>
+      {state?.aviso && <p role="status">{state.aviso}</p>}
       <p className="catalog__intro">
         Explorá nuestras piezas y encontrá esa que hará de tu casa un lugar más tuyo.
       </p>

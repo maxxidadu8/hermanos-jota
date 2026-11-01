@@ -692,6 +692,27 @@ button {
   gap: 1rem;
   margin-top: 1.5rem;
 }
+.button--danger {
+  background: #8c2929;
+  border-color: #8c2929;
+  color: white;
+}
+.button--danger:hover,
+.button--danger:focus-visible {
+  background: #6f1f1f;
+  color: white;
+}
+.delete-dialog {
+  width: min(520px, calc(100% - 2rem));
+  border: 0;
+  border-radius: 8px;
+  padding: 2rem;
+  color: var(--siena);
+  background: var(--blanco);
+}
+.delete-dialog::backdrop {
+  background: #0008;
+}
 .product-fields {
   display: grid;
   gap: 1.25rem;

@@ -77,7 +77,13 @@ detalle con `useNavigate`. Cancelar vuelve al detalle sin guardar. Si se deja el
 stock vacío durante la edición, se guarda como `null` (stock a consultar).
 La carga maneja IDs inválidos, productos inexistentes y errores de conexión.
 
-La eliminación de productos desde React está pendiente.
+El detalle incluye «Eliminar producto», que abre una confirmación con el nombre
+de la pieza. Cancelar o presionar Escape conserva los datos. Confirmar envía
+DELETE y bloquea los botones hasta recibir la respuesta. Un `204` quita el
+producto del catálogo y del carrito y redirige a `/productos` con un aviso.
+Si la API responde `404`, se limpia también el estado local porque el producto
+ya no existe. Otros errores se muestran en el diálogo y permiten reintentar.
+El borrado es definitivo en MongoDB.
 
 Para publicar con `BrowserRouter`, el hosting del frontend deberá devolver
 `index.html` para las rutas de la aplicación. Esa configuración se agregará en

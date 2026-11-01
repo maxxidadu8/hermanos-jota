@@ -12,8 +12,8 @@ La aplicación actual se organiza en `client` (React y Vite) y `backend`
 
 El cliente se incorporó desde la segunda entrega. El catálogo y el carrito
 ya utilizan el modelo de MongoDB y las páginas públicas tienen rutas con React
-Router. El alta y la edición de productos ya funcionan desde React; la eliminación
-desde la interfaz está pendiente. Ver el estado en
+Router. El alta, la edición y la eliminación de productos ya están implementadas
+desde React. La eliminación requiere confirmación. Ver el estado en
 [client/README.md](client/README.md).
 
 Los HTML y archivos de la raíz descritos debajo corresponden al sitio original.
