@@ -69,4 +69,9 @@ async function login(req, res, next) {
   }
 }
 
-module.exports = { registrar, login };
+function obtenerPerfil(req, res) {
+  res.set("Cache-Control", "no-store");
+  res.json({ usuario: req.usuario });
+}
+
+module.exports = { registrar, login, obtenerPerfil };

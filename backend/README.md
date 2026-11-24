@@ -289,6 +289,39 @@ La API verifica esta configuración antes de arrancar y espera a que se cree el
 el `_id` del usuario en `sub`, emisor `hermanos-jota-api` y audiencia
 `hermanos-jota-web`. No contienen contraseñas.
 
-El middleware que verificará `Authorization: Bearer <token>`, el perfil y los
-pedidos se incorporarán en los próximos pasos. En esta etapa los endpoints de
-productos todavía mantienen el acceso de la tercera entrega.
+El middleware `middlewares/autenticar.js` verifica `Authorization: Bearer <token>`.
+El perfil y las escrituras de productos ya requieren autenticación. Los pedidos
+y la integración de sesión en React se incorporarán en los próximos pasos.
+
+## Endpoints protegidos
+
+Enviar el JWT devuelto por registro o login en la cabecera
+`Authorization: Bearer <token>`. El middleware valida firma, algoritmo HS256,
+emisor, audiencia y vencimiento. También exige un `sub` de tipo ObjectId, una
+expiración definida y que el usuario siga existiendo en MongoDB.
+
+| Endpoint | Acceso |
+| --- | --- |
+| `GET /api/productos` | Público |
+| `GET /api/productos/:id` | Público |
+| `POST /api/auth/registro` | Público |
+| `POST /api/auth/login` | Público |
+| `GET /api/auth/perfil` | Autenticado |
+| `POST /api/productos` | Autenticado |
+| `PUT /api/productos/:id` | Autenticado |
+| `DELETE /api/productos/:id` | Autenticado |
+
+El perfil responde `200` con `{ usuario: { _id, nombre, email } }` y no se cachea.
+No devuelve contraseña ni hash. Los datos del usuario provienen de la base,
+identificada mediante el token verificado, nunca del cuerpo de la petición.
+
+Sin Bearer válido, con un token vencido o alterado, o con una cuenta eliminada,
+se devuelve `401`. Una configuración inválida o un fallo de MongoDB devuelve
+`500`, sin revelar el token ni información interna. No se definieron roles en
+esta consigna: en esta etapa cualquier usuario autenticado puede gestionar
+productos.
+
+Las pruebas HTTP locales usan una API en un puerto temporal y simulan la capa
+de datos; comprueban que las rutas estén realmente protegidas sin crear usuarios
+ni productos en Atlas. Hasta incorporar la sesión en React, las operaciones de
+productos desde el frontend recibirán `401` porque aún no envían el Bearer.
