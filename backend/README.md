@@ -252,7 +252,43 @@ La contraseña está excluida de las consultas por defecto y de `toJSON()` y
 con `.select("+password")` y usar `usuario.compararPassword(valor)`; nunca se
 incluirá el hash en la respuesta de la API.
 
-Este paso prepara el modelo y sus pruebas locales. Los endpoints de registro y
-login, los JWT, las rutas protegidas y los pedidos aún están pendientes. Las
-pruebas de usuario simulan las escrituras de la colección para comprobar el
-hook real de Mongoose sin conectar con Atlas.
+Las pruebas de usuario simulan las escrituras de la colección para comprobar
+el hook real de Mongoose sin conectar con Atlas.
+
+## Registro y login con JWT
+
+| Endpoint | Datos JSON | Resultado |
+| --- | --- | --- |
+| `POST /api/auth/registro` | `nombre`, `email`, `password` | `201` con `{ token, usuario }` |
+| `POST /api/auth/login` | `email`, `password` | `200` con `{ token, usuario }` |
+
+`usuario` contiene únicamente `_id`, `nombre` y `email`, nunca el hash. Las
+respuestas de sesión llevan `Cache-Control: no-store`. Registro y login
+normalizan el email y rechazan tipos incorrectos antes de consultar MongoDB.
+Un email duplicado al registrar devuelve `409`. Credenciales incorrectas en el
+login devuelven `401` con el mismo mensaje, tanto si el email no existe como si
+la contraseña no coincide. Datos mal formados devuelven `400`.
+
+### Configuración de JWT
+
+Agregar `JWT_SECRET` en `backend/.env`: debe ser una clave privada aleatoria de
+al menos 32 bytes. Para generar una, ejecutar localmente:
+
+```bash
+node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
+```
+
+Copiar el resultado como valor de `JWT_SECRET`, sin publicarlo ni agregarlo a
+`.env.example`. El `.env` de este entorno de desarrollo ya tiene una clave
+local generada. Cada entorno debe gestionar su propia clave. En Render hay que
+configurar `JWT_SECRET` en Environment **antes de desplegar esta versión**.
+No configurarlo en Vercel ni en una variable `VITE_`: solo lo usa el backend.
+
+La API verifica esta configuración antes de arrancar y espera a que se cree el
+índice único de email. Los tokens se firman con HS256, duran una hora y llevan
+el `_id` del usuario en `sub`, emisor `hermanos-jota-api` y audiencia
+`hermanos-jota-web`. No contienen contraseñas.
+
+El middleware que verificará `Authorization: Bearer <token>`, el perfil y los
+pedidos se incorporarán en los próximos pasos. En esta etapa los endpoints de
+productos todavía mantienen el acceso de la tercera entrega.
