@@ -290,8 +290,8 @@ el `_id` del usuario en `sub`, emisor `hermanos-jota-api` y audiencia
 `hermanos-jota-web`. No contienen contraseñas.
 
 El middleware `middlewares/autenticar.js` verifica `Authorization: Bearer <token>`.
-El perfil y las escrituras de productos ya requieren autenticación. Los pedidos
-y la integración de sesión en React se incorporarán en los próximos pasos.
+El perfil, las escrituras de productos y los pedidos ya requieren autenticación.
+La integración de sesión en React se incorporará en los próximos pasos.
 
 ## Endpoints protegidos
 
@@ -310,6 +310,8 @@ expiración definida y que el usuario siga existiendo en MongoDB.
 | `POST /api/productos` | Autenticado |
 | `PUT /api/productos/:id` | Autenticado |
 | `DELETE /api/productos/:id` | Autenticado |
+| `POST /api/pedidos` | Autenticado |
+| `GET /api/pedidos` | Autenticado |
 
 El perfil responde `200` con `{ usuario: { _id, nombre, email } }` y no se cachea.
 No devuelve contraseña ni hash. Los datos del usuario provienen de la base,
@@ -325,3 +327,52 @@ Las pruebas HTTP locales usan una API en un puerto temporal y simulan la capa
 de datos; comprueban que las rutas estén realmente protegidas sin crear usuarios
 ni productos en Atlas. Hasta incorporar la sesión en React, las operaciones de
 productos desde el frontend recibirán `401` porque aún no envían el Bearer.
+
+## Pedidos del usuario
+
+El modelo `Order` guarda el usuario autenticado, las líneas del pedido, el total,
+la moneda `ARS`, el estado `pendiente` y las fechas de creación y actualización.
+Cada línea conserva referencia al producto, nombre e imagen del momento, precio
+unitario, cantidad y subtotal. El historial se lee sin poblar el catálogo actual,
+por lo que cambios o eliminaciones de productos no alteran pedidos anteriores.
+
+### Crear un pedido
+
+`POST /api/pedidos`, con `Authorization: Bearer <token>` y cuerpo JSON:
+
+```json
+{
+  "items": [
+    { "productoId": "af42d37d95c98624f3f62bf3", "cantidad": 2 }
+  ]
+}
+```
+
+El ID debe existir en la base de destino. El servidor ignora cualquier usuario,
+nombre, precio, subtotal, total, moneda o estado enviados por el cliente: obtiene
+la identidad del JWT y los productos de MongoDB. Admite entre 1 y 100 líneas,
+con IDs válidos y cantidades enteras positivas. Suma las cantidades de productos
+repetidos antes de validar disponibilidad.
+
+Los precios se redondean a centavos y los cálculos se hacen con enteros para
+evitar errores como `0.1 + 0.2`. Si el producto declara stock, se comprueba que
+alcance; si el stock está ausente o es `null`, no se impone un límite. Se rechazan
+importes fuera de la precisión segura.
+
+La respuesta es `201` con el pedido guardado. Datos inválidos devuelven `400`,
+productos inexistentes `404` y stock insuficiente o precio no disponible `409`.
+Si una línea es inválida, no se guarda un pedido parcial. Los fallos de base
+devuelven `500` sin confirmar el pedido.
+
+Este flujo registra pedidos: no cobra pagos ni reserva o descuenta inventario.
+La disponibilidad se verifica al consultar el catálogo, sin una reserva
+transaccional entre compras simultáneas. La consigna no exige pasarela de pagos
+ni gestión transaccional de inventario.
+
+### Consultar mis pedidos
+
+`GET /api/pedidos`, con el mismo Bearer, devuelve `200` y un array con los pedidos
+del usuario del token, desde el más reciente. Una cuenta sin pedidos recibe `[]`.
+No se acepta un usuario alternativo por query ni por el cuerpo de la petición.
+Las respuestas de pedidos usan `Cache-Control: no-store`. Las pruebas incluyen
+dos usuarios distintos para comprobar el aislamiento, sin escribir datos en Atlas.

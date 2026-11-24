@@ -2,6 +2,7 @@ const express = require("express");
 const logger = require("./middlewares/logger");
 const productosRouter = require("./routes/productos");
 const authRouter = require("./routes/auth");
+const pedidosRouter = require("./routes/pedidos");
 const notFound = require("./middlewares/notFound");
 const errorHandler = require("./middlewares/errorHandler");
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/api/productos", productosRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/pedidos", pedidosRouter);
 
 // Después de las rutas: primero el 404 y, al final, los errores.
 app.use(notFound);
