@@ -232,3 +232,27 @@ El comando muestra cuántos productos creó y cuántos ya existían, y cierra la
 conexión al terminar. Si la conexión falla a mitad de la carga, se puede volver
 a ejecutar para completar las piezas restantes. No se ejecuta al iniciar el
 servidor: la carga se realiza únicamente con este comando.
+
+## Cuarta entrega: modelo de usuario
+
+El modelo `User` de `models/User.js` incorpora `nombre`, `email` y `password`
+obligatorios. El nombre se recorta y el email se guarda en minúsculas, sin
+espacios al principio o al final, con un índice único para impedir duplicados.
+El registro deberá manejar también el error de email duplicado de MongoDB:
+`unique` define un índice, no un validador de Mongoose.
+
+La contraseña debe tener al menos 8 caracteres y como máximo 72 bytes UTF-8.
+Antes de guardarla con `create()` o `save()`, el modelo genera un hash bcrypt
+con factor de trabajo 12. El hook solo actúa cuando cambia la contraseña, por
+lo que editar el nombre no vuelve a hashearla. No usar actualizaciones directas
+como `updateOne()` para cambiar contraseñas: no ejecutan el hook de `save()`.
+
+La contraseña está excluida de las consultas por defecto y de `toJSON()` y
+`toObject()`. Para verificarla en el login se deberá seleccionar explícitamente
+con `.select("+password")` y usar `usuario.compararPassword(valor)`; nunca se
+incluirá el hash en la respuesta de la API.
+
+Este paso prepara el modelo y sus pruebas locales. Los endpoints de registro y
+login, los JWT, las rutas protegidas y los pedidos aún están pendientes. Las
+pruebas de usuario simulan las escrituras de la colección para comprobar el
+hook real de Mongoose sin conectar con Atlas.
