@@ -9,11 +9,17 @@ import ContactForm from "./components/ContactForm.jsx";
 import CartDrawer from "./components/CartDrawer.jsx";
 import CreateProductPage from "./components/CreateProductPage.jsx";
 import EditProductPage from "./components/EditProductPage.jsx";
+import AuthPage from "./components/AuthPage.jsx";
+import ProfilePage from "./components/ProfilePage.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const titulos = {
   "/": "Hermanos Jota | Muebles con historia",
   "/productos": "Catálogo | Hermanos Jota",
   "/contacto": "Contacto | Hermanos Jota",
+  "/login": "Iniciar sesión | Hermanos Jota",
+  "/registro": "Crear cuenta | Hermanos Jota",
+  "/perfil": "Mi perfil | Hermanos Jota",
   "/admin/crear-producto": "Crear producto | Hermanos Jota",
 };
 
@@ -130,8 +136,13 @@ function App() {
         } />
         <Route path="/productos/:id" element={<ProductPage onAgregar={agregarAlCarrito} onEliminado={eliminarProducto} />} />
         <Route path="/contacto" element={<ContactForm />} />
-        <Route path="/admin/crear-producto" element={<CreateProductPage onCreado={reintentar} />} />
-        <Route path="/admin/editar-producto/:id" element={<EditProductPage onActualizado={actualizarProducto} />} />
+        <Route path="/login" element={<AuthPage key="login" />} />
+        <Route path="/registro" element={<AuthPage key="registro" registro />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/perfil" element={<ProfilePage />} />
+          <Route path="/admin/crear-producto" element={<CreateProductPage onCreado={reintentar} />} />
+          <Route path="/admin/editar-producto/:id" element={<EditProductPage onActualizado={actualizarProducto} />} />
+        </Route>
         <Route path="*" element={
           <main id="contenido" className="section">
             <h1>Página no encontrada</h1>

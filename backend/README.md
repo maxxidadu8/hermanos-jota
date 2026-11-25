@@ -325,8 +325,8 @@ productos.
 
 Las pruebas HTTP locales usan una API en un puerto temporal y simulan la capa
 de datos; comprueban que las rutas estén realmente protegidas sin crear usuarios
-ni productos en Atlas. Hasta incorporar la sesión en React, las operaciones de
-productos desde el frontend recibirán `401` porque aún no envían el Bearer.
+ni productos en Atlas. El frontend ya incorpora la sesión mediante AuthContext y envía el Bearer en
+las operaciones de productos. Los pedidos desde React se incorporarán después.
 
 ## Pedidos del usuario
 

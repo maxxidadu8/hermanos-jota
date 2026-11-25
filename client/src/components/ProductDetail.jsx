@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 import ProductImage from "./ProductImage.jsx";
 import DeleteProductButton from "./DeleteProductButton.jsx";
 import { formatearPrecio, describirStock } from "../utils/productos.js";
 
 function ProductDetail({ producto, onAgregar, onEliminado }) {
+  const { usuario, cargando } = useAuth();
   const navigate = useNavigate();
   const [agregado, setAgregado] = useState(false);
 
@@ -41,10 +43,10 @@ function ProductDetail({ producto, onAgregar, onEliminado }) {
           <p className="form-message" aria-live="polite">
             {agregado && "La pieza fue añadida al carrito."}
           </p>
-          <div className="product-admin-actions">
+          {usuario && !cargando && <div className="product-admin-actions">
             <Link className="button button--ghost" to={`/admin/editar-producto/${producto._id}`}>Editar producto</Link>
             <DeleteProductButton producto={producto} onEliminado={onEliminado} />
-          </div>
+          </div>}
         </div>
       </article>
     </main>

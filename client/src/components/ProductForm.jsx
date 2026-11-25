@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { useAuth } from "../context/AuthContext.jsx";
+
 function datosDelProducto(producto) {
   return {
     nombre: producto?.nombre ?? "",
@@ -12,6 +14,7 @@ function datosDelProducto(producto) {
 }
 
 function ProductForm({ productoInicial, onGuardado }) {
+  const { fetchAutenticado } = useAuth();
   const editando = Boolean(productoInicial);
   const navigate = useNavigate();
   const [datos, setDatos] = useState(() => datosDelProducto(productoInicial));
@@ -53,7 +56,7 @@ function ProductForm({ productoInicial, onGuardado }) {
     pendiente.current = true;
     setEnviando(true);
     try {
-      const res = await fetch(editando ? `/api/productos/${productoInicial._id}` : "/api/productos", {
+      const res = await fetchAutenticado(editando ? `/api/productos/${productoInicial._id}` : "/api/productos", {
         method: editando ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

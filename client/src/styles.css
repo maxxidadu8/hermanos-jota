@@ -76,6 +76,8 @@
   .site-header {
     min-height: 76px;
     display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
     align-items: center;
     justify-content: space-between;
     padding: 12px clamp(1.25rem, 5vw, 5rem);
@@ -102,6 +104,7 @@
   }
   .nav {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: clamp(0.65rem, 2vw, 1.7rem);
   }
@@ -724,6 +727,20 @@ button {
 .field-help {
   font-size: 0.875rem;
   color: #665650;
+}
+.session-logout {
+  background: transparent;
+  border: 0;
+  color: var(--siena);
+  text-decoration: underline;
+  padding: 0.5rem;
+}
+.profile-data dt {
+  font-weight: 700;
+  margin-top: 1rem;
+}
+.profile-data dd {
+  margin: 0.25rem 0 1.5rem;
 }
 .estado {
   padding: 2rem 0;

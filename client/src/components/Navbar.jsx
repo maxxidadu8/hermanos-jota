@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
-const enlaces = [
+import { useAuth } from "../context/AuthContext.jsx";
+
+const enlacesPublicos = [
   { ruta: "/", texto: "Inicio" },
   { ruta: "/productos", texto: "Catálogo" },
   { ruta: "/contacto", texto: "Contacto" },
-  { ruta: "/admin/crear-producto", texto: "Crear producto" },
 ];
 
 function Navbar({ cantidadCarrito, onAbrirCarrito }) {
+  const { usuario, cargando, cerrarSesion } = useAuth();
+  const navigate = useNavigate();
+  const enlaces = [...enlacesPublicos, ...(usuario ? [
+    { ruta: "/admin/crear-producto", texto: "Crear producto" },
+    { ruta: "/perfil", texto: "Mi perfil" },
+  ] : cargando ? [] : [
+    { ruta: "/login", texto: "Ingresar" },
+    { ruta: "/registro", texto: "Registrarme" },
+  ])];
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   const { pathname } = useLocation();
@@ -40,6 +50,10 @@ function Navbar({ cantidadCarrito, onAbrirCarrito }) {
             {enlace.texto}
           </NavLink>
         ))}
+        {cargando && <span role="status">Verificando sesión…</span>}
+        {usuario && <button type="button" className="session-logout" onClick={() => {
+          cerrarSesion(); setMenuAbierto(false); navigate("/", { replace: true });
+        }}>Cerrar sesión</button>}
         <button
           type="button"
           className="cart"

@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../context/AuthContext.jsx";
+
 function DeleteProductButton({ producto, onEliminado }) {
+  const { fetchAutenticado } = useAuth();
   const navigate = useNavigate();
   const dialogo = useRef(null);
   const pendiente = useRef(false);
@@ -27,7 +30,7 @@ function DeleteProductButton({ producto, onEliminado }) {
     setError("");
 
     try {
-      const res = await fetch(`/api/productos/${producto._id}`, { method: "DELETE" });
+      const res = await fetchAutenticado(`/api/productos/${producto._id}`, { method: "DELETE" });
       if (res.status !== 204 && res.status !== 404) {
         throw new Error("No pudimos eliminar el producto. Intentá nuevamente.");
       }

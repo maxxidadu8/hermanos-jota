@@ -51,8 +51,11 @@ simulado: muestra el total, pero no reserva ni descuenta stock en MongoDB.
 | `/productos` | Catálogo |
 | `/productos/:id` | Detalle, con `useParams` y consulta a la API por `_id` |
 | `/contacto` | Formulario de contacto |
-| `/admin/crear-producto` | Formulario controlado de alta de productos |
-| `/admin/editar-producto/:id` | Formulario precargado de edición |
+| `/registro` | Registro de usuario |
+| `/login` | Inicio de sesión |
+| `/perfil` | Perfil autenticado |
+| `/admin/crear-producto` | Alta, requiere sesión |
+| `/admin/editar-producto/:id` | Edición, requiere sesión |
 | Cualquier otra | Página no encontrada |
 
 El detalle permite acceso directo y recarga, muestra carga y errores y permite
@@ -91,3 +94,43 @@ la etapa de despliegue; Vite ya ofrece ese comportamiento en desarrollo.
 
 Mantener dos terminales: una en `backend` con `npm start` y otra en `client`
 con `npm run dev`. El backend requiere configurar previamente su `.env`.
+
+## Cuarta entrega: autenticación con Context API
+
+`AuthProvider` envuelve la aplicación y expone `useAuth` para compartir el
+usuario, la comprobación de sesión, login, registro, logout y peticiones con JWT.
+Los formularios `/registro` y `/login` son controlados; la contraseña solo se
+envía a la API y no se guarda en el navegador.
+
+El JWT se conserva en `localStorage` bajo `hermanos-jota-token` para mantener la
+sesión al recargar. Al iniciar, el contexto consulta `GET /api/auth/perfil` con
+`Authorization: Bearer <token>`: no considera autenticado a un usuario por
+limitarse a decodificar el token. La expiración se lee solo para programar el
+logout; la firma y los permisos se verifican en el backend.
+
+`ProtectedRoute` protege `/perfil` y la creación/edición de productos. Espera
+la respuesta de perfil antes de mostrar contenido privado y redirige al login
+si no hay sesión. Después del login o registro, `useNavigate` devuelve al
+usuario a la ruta interna solicitada, o a `/perfil` por defecto. El contexto
+permite reintentar una recuperación de sesión si falla la red sin borrar el
+token válido.
+
+El menú muestra Ingresar/Registrarme a invitados y Mi perfil/Crear producto/
+Cerrar sesión a usuarios autenticados. Editar y eliminar productos también
+se muestran solo con sesión. `fetchAutenticado` adjunta el Bearer a las
+operaciones de productos, limita su uso a rutas `/api/` del sitio y cierra
+sesión ante un `401`. Un `401` atrasado de otra sesión no cierra la nueva.
+La sesión también se cierra al vencer el token y sincroniza el logout entre
+pestañas.
+
+El carrito aún está en `App`: su Context, Finalizar compra y `/mis-pedidos`
+son el próximo paso. La protección del frontend no sustituye el middleware
+de autorización del backend.
+
+### Pruebas del frontend
+
+Desde `client`, ejecutar `npm test`. Las pruebas usan Vitest, React Testing
+Library y JSDOM, con respuestas de API simuladas. Comprueban registro/login,
+recuperación de sesión, rutas protegidas, logout, vencimiento, errores y envío
+del Bearer. No crean usuarios ni productos en Atlas. `npm run build` verifica
+la compilación para producción.
