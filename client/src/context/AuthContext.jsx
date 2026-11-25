@@ -10,8 +10,12 @@ export function AuthProvider({ children }) {
   const [cargando, setCargando] = useState(Boolean(token));
   const [errorSesion, setErrorSesion] = useState("");
   const [intento, setIntento] = useState(0);
+  const [versionSesion, setVersionSesion] = useState(0);
+  const versionActual = useRef(0);
 
   const cambiarToken = useCallback(valor => {
+    versionActual.current += 1;
+    setVersionSesion(versionActual.current);
     tokenActual.current = valor;
     guardarToken(valor);
     setToken(valor);
@@ -21,6 +25,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const cerrarSesion = useCallback(() => cambiarToken(null), [cambiarToken]);
+  const esSesionActual = useCallback(version => versionActual.current === version, []);
   const reintentarSesion = useCallback(() => {
     setCargando(Boolean(tokenActual.current));
     setIntento(n => n + 1);
@@ -112,7 +117,7 @@ export function AuthProvider({ children }) {
   }, [cerrarSesion]);
 
   return (
-    <AuthContext.Provider value={{ usuario, cargando, errorSesion, iniciarSesion, registrar, cerrarSesion, reintentarSesion, fetchAutenticado }}>
+    <AuthContext.Provider value={{ usuario, cargando, errorSesion, versionSesion, esSesionActual, iniciarSesion, registrar, cerrarSesion, reintentarSesion, fetchAutenticado }}>
       {children}
     </AuthContext.Provider>
   );

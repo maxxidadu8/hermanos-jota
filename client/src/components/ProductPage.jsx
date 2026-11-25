@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ProductDetail from "./ProductDetail.jsx";
 
-function ProductPage({ onAgregar, onEliminado }) {
+function ProductPage({ onEliminado }) {
   const { id } = useParams();
   // Reiniciar el estado y cancelar la petición anterior cuando cambia el ID.
-  return <ProductLoader key={id} id={id} onAgregar={onAgregar} onEliminado={onEliminado} />;
+  return <ProductLoader key={id} id={id} onEliminado={onEliminado} />;
 }
 
-function ProductLoader({ id, onAgregar, onEliminado }) {
+function ProductLoader({ id, onEliminado }) {
   const [producto, setProducto] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -56,7 +56,7 @@ function ProductLoader({ id, onAgregar, onEliminado }) {
     );
   }
 
-  return <ProductDetail producto={producto} onAgregar={onAgregar} onEliminado={onEliminado} />;
+  return <ProductDetail producto={producto} onEliminado={onEliminado} />;
 }
 
 export default ProductPage;

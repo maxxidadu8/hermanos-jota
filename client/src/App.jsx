@@ -12,6 +12,9 @@ import EditProductPage from "./components/EditProductPage.jsx";
 import AuthPage from "./components/AuthPage.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import CheckoutPage from "./components/CheckoutPage.jsx";
+import OrdersPage from "./components/OrdersPage.jsx";
+import { useCart } from "./context/CartContext.jsx";
 
 const titulos = {
   "/": "Hermanos Jota | Muebles con historia",
@@ -20,11 +23,14 @@ const titulos = {
   "/login": "Iniciar sesión | Hermanos Jota",
   "/registro": "Crear cuenta | Hermanos Jota",
   "/perfil": "Mi perfil | Hermanos Jota",
+  "/mis-pedidos": "Mis pedidos | Hermanos Jota",
+  "/finalizar-compra": "Finalizar compra | Hermanos Jota",
   "/admin/crear-producto": "Crear producto | Hermanos Jota",
 };
 
 function App() {
   const { pathname } = useLocation();
+  const { actualizarProducto: actualizarCarrito, eliminarProducto: eliminarDelCarrito } = useCart();
 
   // Ciclo de vida de la petición al backend.
   const [productos, setProductos] = useState([]);
@@ -32,8 +38,6 @@ function App() {
   const [error, setError] = useState(null);
   const [intento, setIntento] = useState(0);
 
-  // Carrito: array de { producto, cantidad }.
-  const [carrito, setCarrito] = useState([]);
   const [carritoAbierto, setCarritoAbierto] = useState(false);
 
   useEffect(() => {
@@ -77,45 +81,14 @@ function App() {
     document.body.classList.toggle("cart-open", carritoAbierto);
   }, [carritoAbierto]);
 
-  const agregarAlCarrito = (producto) => {
-    setCarrito((actual) =>
-      actual.some((item) => item.producto._id === producto._id)
-        ? actual.map((item) =>
-            item.producto._id === producto._id
-              ? { ...item, cantidad: item.cantidad + 1 }
-              : item,
-          )
-        : [...actual, { producto, cantidad: 1 }],
-    );
-  };
-
-  const cambiarCantidad = (id, cambio) => {
-    setCarrito((actual) =>
-      actual
-        .map((item) =>
-          item.producto._id === id
-            ? { ...item, cantidad: item.cantidad + cambio }
-            : item,
-        )
-        .filter((item) => item.cantidad > 0),
-    );
-  };
-
-  const quitarDelCarrito = (id) => {
-    setCarrito((actual) => actual.filter((item) => item.producto._id !== id));
-  };
-
-  const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
   const reintentar = () => setIntento((n) => n + 1);
   const actualizarProducto = (producto) => {
-    setCarrito(actual => actual.map(item => item.producto._id === producto._id
-      ? { ...item, producto }
-      : item));
+    actualizarCarrito(producto);
     reintentar();
   };
   const eliminarProducto = (id) => {
     setProductos(actual => actual.filter(producto => producto._id !== id));
-    setCarrito(actual => actual.filter(item => item.producto._id !== id));
+    eliminarDelCarrito(id);
     reintentar();
   };
 
@@ -123,7 +96,6 @@ function App() {
     <>
       <a className="skip-link" href="#contenido">Saltar al contenido</a>
       <Navbar
-        cantidadCarrito={cantidadCarrito}
         onAbrirCarrito={() => setCarritoAbierto(true)}
       />
 
@@ -134,12 +106,14 @@ function App() {
         <Route path="/productos" element={
           <Catalog productos={productos} cargando={cargando} error={error} onReintentar={reintentar} />
         } />
-        <Route path="/productos/:id" element={<ProductPage onAgregar={agregarAlCarrito} onEliminado={eliminarProducto} />} />
+        <Route path="/productos/:id" element={<ProductPage onEliminado={eliminarProducto} />} />
         <Route path="/contacto" element={<ContactForm />} />
         <Route path="/login" element={<AuthPage key="login" />} />
         <Route path="/registro" element={<AuthPage key="registro" registro />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/perfil" element={<ProfilePage />} />
+          <Route path="/mis-pedidos" element={<OrdersPage />} />
+          <Route path="/finalizar-compra" element={<CheckoutPage />} />
           <Route path="/admin/crear-producto" element={<CreateProductPage onCreado={reintentar} />} />
           <Route path="/admin/editar-producto/:id" element={<EditProductPage onActualizado={actualizarProducto} />} />
         </Route>
@@ -155,14 +129,7 @@ function App() {
       <Footer />
 
       {carritoAbierto && (
-        <CartDrawer
-          carrito={carrito}
-          cantidadTotal={cantidadCarrito}
-          onCerrar={() => setCarritoAbierto(false)}
-          onCambiarCantidad={cambiarCantidad}
-          onQuitar={quitarDelCarrito}
-          onVaciar={() => setCarrito([])}
-        />
+        <CartDrawer onCerrar={() => setCarritoAbierto(false)} />
       )}
     </>
   );

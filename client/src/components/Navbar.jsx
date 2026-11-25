@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
+import { useCart } from "../context/CartContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const enlacesPublicos = [
@@ -9,12 +10,14 @@ const enlacesPublicos = [
   { ruta: "/contacto", texto: "Contacto" },
 ];
 
-function Navbar({ cantidadCarrito, onAbrirCarrito }) {
+function Navbar({ onAbrirCarrito }) {
+  const { cantidadCarrito } = useCart();
   const { usuario, cargando, cerrarSesion } = useAuth();
   const navigate = useNavigate();
   const enlaces = [...enlacesPublicos, ...(usuario ? [
     { ruta: "/admin/crear-producto", texto: "Crear producto" },
     { ruta: "/perfil", texto: "Mi perfil" },
+    { ruta: "/mis-pedidos", texto: "Mis pedidos" },
   ] : cargando ? [] : [
     { ruta: "/login", texto: "Ingresar" },
     { ruta: "/registro", texto: "Registrarme" },

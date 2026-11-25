@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import ProductImage from "./ProductImage.jsx";
 import DeleteProductButton from "./DeleteProductButton.jsx";
 import { formatearPrecio, describirStock } from "../utils/productos.js";
 
-function ProductDetail({ producto, onAgregar, onEliminado }) {
+function ProductDetail({ producto, onEliminado }) {
   const { usuario, cargando } = useAuth();
+  const { carrito, agregarAlCarrito, enviando } = useCart();
+  const cantidadEnCarrito = carrito.find(item => item.producto._id === producto._id)?.cantidad ?? 0;
   const navigate = useNavigate();
   const [agregado, setAgregado] = useState(false);
 
@@ -32,9 +35,9 @@ function ProductDetail({ producto, onAgregar, onEliminado }) {
           <button
             type="button"
             className="button"
-            disabled={Number.isFinite(producto.stock) && producto.stock <= 0}
+            disabled={enviando || (Number.isFinite(producto.stock) && producto.stock <= cantidadEnCarrito)}
             onClick={() => {
-              onAgregar(producto);
+              agregarAlCarrito(producto);
               setAgregado(true);
             }}
           >

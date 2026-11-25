@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function ProfilePage() {
@@ -12,6 +12,7 @@ function ProfilePage() {
         <dt>Nombre</dt><dd>{usuario.nombre}</dd>
         <dt>Email</dt><dd>{usuario.email}</dd>
       </dl>
+      <p><Link className="text-link" to="/mis-pedidos">Ver mis pedidos</Link></p>
       <button className="button" onClick={() => { cerrarSesion(); navigate("/login", { replace: true }); }}>Cerrar sesión</button>
     </main>
   );

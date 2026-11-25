@@ -4,6 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { MemoryRouter } from "react-router-dom";
 import App from "../App.jsx";
 import { AuthProvider, useAuth } from "../context/AuthContext.jsx";
+import { CartProvider } from "../context/CartContext.jsx";
 import { destinoTrasLogin, TOKEN_KEY } from "../utils/sesion.js";
 
 const usuario = { _id: "507f1f77bcf86cd799439011", nombre: "Ana", email: "ana@ejemplo.com" };
@@ -26,7 +27,7 @@ function simularFetch(handler = () => undefined) {
   return mock;
 }
 function abrir(ruta) {
-  return render(<MemoryRouter initialEntries={[ruta]}><AuthProvider><App /></AuthProvider></MemoryRouter>);
+  return render(<MemoryRouter initialEntries={[ruta]}><AuthProvider><CartProvider><App /></CartProvider></AuthProvider></MemoryRouter>);
 }
 beforeEach(() => {
   localStorage.clear();
