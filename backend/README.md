@@ -1,6 +1,6 @@
 # Backend de Hermanos Jota
 
-API de productos construida con Node.js y Express.
+API de productos, autenticación y pedidos construida con Node.js, Express y Mongoose.
 
 ## Ejecución
 
@@ -11,7 +11,8 @@ npm install
 cp .env.example .env
 ```
 
-Editar `backend/.env` y reemplazar el ejemplo de `MONGODB_URI` por la cadena de
+Editar `backend/.env`, configurar `JWT_SECRET` con una clave aleatoria de al menos
+32 bytes (ver Configuración de JWT) y reemplazar el ejemplo de `MONGODB_URI` por la cadena de
 conexión de MongoDB Atlas, incluyendo el nombre de la base `hermanos-jota`.
 En Atlas, crear un usuario de base de datos y permitir la IP desde la que se
 ejecutará la API. Si la contraseña contiene caracteres especiales, deben estar
@@ -28,7 +29,7 @@ npm start
 ```
 
 La API espera a que Mongoose se conecte a MongoDB antes de escuchar peticiones.
-Si falta la URI o la conexión falla, termina con código de error y muestra un
+Si falta la URI, `JWT_SECRET` es inválido o la conexión falla, termina con código de error y muestra un
 mensaje sin exponer credenciales. La selección del servidor tiene un tiempo
 máximo de 10 segundos.
 
@@ -166,6 +167,12 @@ Desde `backend`, ejecutar `npm test`. Las pruebas verifican las consultas y el
 manejo de errores con respuestas simuladas del modelo; no requieren Atlas ni
 sustituyen una prueba real de conexión y consulta a MongoDB.
 
+## Ejemplos de escrituras autenticadas
+
+Los siguientes ejemplos requieren definir localmente `TOKEN` con el JWT obtenido
+al registrarse o iniciar sesión. Sin Bearer, la API devuelve `401`. No publicar
+el token ni incorporarlo al repositorio.
+
 ## Crear un producto
 
 Con la API iniciada, desde otra terminal:
@@ -173,6 +180,7 @@ Con la API iniciada, desde otra terminal:
 ```bash
 curl -i -X POST http://localhost:3001/api/productos \
   -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{"nombre":"Mesa de prueba","descripcion":"Producto de prueba","precio":1000,"stock":2,"imagenUrl":""}'
 ```
 
@@ -187,6 +195,7 @@ Reemplazar el ID de ejemplo por el `_id` de un producto existente:
 ```bash
 curl -i -X PUT http://localhost:3001/api/productos/507f1f77bcf86cd799439011 \
   -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{"precio":1500,"stock":3}'
 ```
 
@@ -199,7 +208,8 @@ Reemplazar el ID de ejemplo por el `_id` del producto que se quiere eliminar.
 Esta operación borra el producto de la base configurada:
 
 ```bash
-curl -i -X DELETE http://localhost:3001/api/productos/507f1f77bcf86cd799439011
+curl -i -X DELETE http://localhost:3001/api/productos/507f1f77bcf86cd799439011 \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 La respuesta debe ser `204`, sin JSON. Un GET posterior al mismo ID devuelve
@@ -238,7 +248,7 @@ servidor: la carga se realiza únicamente con este comando.
 El modelo `User` de `models/User.js` incorpora `nombre`, `email` y `password`
 obligatorios. El nombre se recorta y el email se guarda en minúsculas, sin
 espacios al principio o al final, con un índice único para impedir duplicados.
-El registro deberá manejar también el error de email duplicado de MongoDB:
+El registro maneja también el error de email duplicado de MongoDB:
 `unique` define un índice, no un validador de Mongoose.
 
 La contraseña debe tener al menos 8 caracteres y como máximo 72 bytes UTF-8.
@@ -248,9 +258,9 @@ lo que editar el nombre no vuelve a hashearla. No usar actualizaciones directas
 como `updateOne()` para cambiar contraseñas: no ejecutan el hook de `save()`.
 
 La contraseña está excluida de las consultas por defecto y de `toJSON()` y
-`toObject()`. Para verificarla en el login se deberá seleccionar explícitamente
-con `.select("+password")` y usar `usuario.compararPassword(valor)`; nunca se
-incluirá el hash en la respuesta de la API.
+`toObject()`. Para verificarla, el login la selecciona explícitamente
+con `.select("+password")` y usa `usuario.compararPassword(valor)`; nunca se
+incluye el hash en la respuesta de la API.
 
 Las pruebas de usuario simulan las escrituras de la colección para comprobar
 el hook real de Mongoose sin conectar con Atlas.
@@ -279,8 +289,7 @@ node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
 ```
 
 Copiar el resultado como valor de `JWT_SECRET`, sin publicarlo ni agregarlo a
-`.env.example`. El `.env` de este entorno de desarrollo ya tiene una clave
-local generada. Cada entorno debe gestionar su propia clave. En Render hay que
+`.env.example`. Cada entorno debe gestionar su propia clave. En Render hay que
 configurar `JWT_SECRET` en Environment **antes de desplegar esta versión**.
 No configurarlo en Vercel ni en una variable `VITE_`: solo lo usa el backend.
 
@@ -291,7 +300,8 @@ el `_id` del usuario en `sub`, emisor `hermanos-jota-api` y audiencia
 
 El middleware `middlewares/autenticar.js` verifica `Authorization: Bearer <token>`.
 El perfil, las escrituras de productos y los pedidos ya requieren autenticación.
-La integración de sesión en React se incorporará en los próximos pasos.
+El frontend integra la sesión mediante `AuthContext`, rutas protegidas y
+peticiones autenticadas con Bearer.
 
 ## Endpoints protegidos
 
@@ -326,7 +336,8 @@ productos.
 Las pruebas HTTP locales usan una API en un puerto temporal y simulan la capa
 de datos; comprueban que las rutas estén realmente protegidas sin crear usuarios
 ni productos en Atlas. El frontend ya incorpora la sesión mediante AuthContext y envía el Bearer en
-las operaciones de productos. Los pedidos desde React se incorporarán después.
+las operaciones de productos y pedidos. `CartContext` gestiona el carrito y la
+confirmación; `/mis-pedidos` consulta el historial del usuario autenticado.
 
 ## Pedidos del usuario
 

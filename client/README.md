@@ -32,7 +32,7 @@ contacto. La API sí permite crear productos mediante POST.
 
 ## Estado de la integración
 
-Este cliente se recuperó de la segunda entrega en `main` y ahora utiliza `_id`
+El cliente utiliza `_id`
 para identificar los productos en el catálogo y el carrito. Muestra `imagenUrl`,
 `precio` en pesos argentinos y `stock`; ya no requiere el campo `detalles` del
 catálogo anterior. La descripción y la imagen son opcionales: las imágenes
@@ -120,7 +120,7 @@ token válido.
 El menú muestra Ingresar/Registrarme a invitados y Mi perfil/Mis pedidos/Crear producto/
 Cerrar sesión a usuarios autenticados. Editar y eliminar productos también
 se muestran solo con sesión. `fetchAutenticado` adjunta el Bearer a las
-operaciones de productos, limita su uso a rutas `/api/` del sitio y cierra
+operaciones de productos y pedidos, limita su uso a rutas `/api/` del sitio y cierra
 sesión ante un `401`. Un `401` atrasado de otra sesión no cierra la nueva.
 La sesión también se cierra al vencer el token y sincroniza el logout entre
 pestañas.
