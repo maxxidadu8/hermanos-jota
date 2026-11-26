@@ -76,6 +76,8 @@
   .site-header {
     min-height: 76px;
     display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
     align-items: center;
     justify-content: space-between;
     padding: 12px clamp(1.25rem, 5vw, 5rem);
@@ -102,6 +104,7 @@
   }
   .nav {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: clamp(0.65rem, 2vw, 1.7rem);
   }
@@ -724,6 +727,43 @@ button {
 .field-help {
   font-size: 0.875rem;
   color: #665650;
+}
+.session-logout {
+  background: transparent;
+  border: 0;
+  color: var(--siena);
+  text-decoration: underline;
+  padding: 0.5rem;
+}
+.profile-data dt {
+  font-weight: 700;
+  margin-top: 1rem;
+}
+.profile-data dd {
+  margin: 0.25rem 0 1.5rem;
+}
+.checkout-items {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+.checkout-items li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #a0522d24;
+}
+.orders-list {
+  display: grid;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+.order-card {
+  border: 1px solid #a0522d40;
+  border-radius: 8px;
+  padding: clamp(1rem, 3vw, 2rem);
 }
 .estado {
   padding: 2rem 0;

@@ -1,16 +1,11 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 import ProductImage from "./ProductImage.jsx";
 import { formatearPrecio } from "../utils/productos.js";
 
-function CartDrawer({
-  carrito,
-  cantidadTotal,
-  onCerrar,
-  onCambiarCantidad,
-  onQuitar,
-  onVaciar,
-}) {
+function CartDrawer({ onCerrar }) {
+  const { carrito, cantidadCarrito: cantidadTotal, total, enviando, cambiarCantidad: onCambiarCantidad, quitarDelCarrito: onQuitar, vaciarCarrito: onVaciar } = useCart();
   useEffect(() => {
     const cerrarConEscape = (e) => {
       if (e.key === "Escape") onCerrar();
@@ -62,6 +57,7 @@ function CartDrawer({
                       <button
                         type="button"
                         aria-label={`Restar ${producto.nombre}`}
+                        disabled={enviando}
                         onClick={() => onCambiarCantidad(producto._id, -1)}
                       >
                         −
@@ -70,6 +66,7 @@ function CartDrawer({
                       <button
                         type="button"
                         aria-label={`Sumar ${producto.nombre}`}
+                        disabled={enviando || (Number.isFinite(producto.stock) && cantidad >= producto.stock)}
                         onClick={() => onCambiarCantidad(producto._id, 1)}
                       >
                         +
@@ -78,6 +75,7 @@ function CartDrawer({
                     <button
                       type="button"
                       className="cart-item__remove"
+                      disabled={enviando}
                       onClick={() => onQuitar(producto._id)}
                     >
                       Quitar
@@ -93,15 +91,15 @@ function CartDrawer({
           {carrito.length > 0 && (
             <>
               <p className="cart-summary">
-                {cantidadTotal} {cantidadTotal === 1 ? "pieza" : "piezas"} · Total: {formatearPrecio(carrito.reduce((total, { producto, cantidad }) => total + producto.precio * cantidad, 0))}
+                {cantidadTotal} {cantidadTotal === 1 ? "pieza" : "piezas"} · Total: {formatearPrecio(total)}
               </p>
               <div className="cart-drawer__actions">
-                <button type="button" className="button button--ghost" onClick={onVaciar}>
+                <button type="button" className="button button--ghost" disabled={enviando} onClick={onVaciar}>
                   Vaciar
                 </button>
-                <Link className="button" to="/contacto" onClick={onCerrar}>
-                  Solicitar consulta
-                </Link>
+                {enviando ? <p role="status">Estamos registrando tu pedido…</p> : <Link className="button" to="/finalizar-compra" onClick={onCerrar}>
+                  Finalizar compra
+                </Link>}
               </div>
             </>
           )}

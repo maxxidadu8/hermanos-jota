@@ -1,4 +1,5 @@
 const express = require("express");
+const autenticar = require("../middlewares/autenticar");
 const {
   listarProductos,
   obtenerProductoPorId,
@@ -16,12 +17,12 @@ router.get("/", listarProductos);
 router.get("/:id", obtenerProductoPorId);
 
 // POST /api/productos: guarda un producto y devuelve 201.
-router.post("/", crearProducto);
+router.post("/", autenticar, crearProducto);
 
 // PUT /api/productos/:id: valida y guarda los cambios de un producto existente.
-router.put("/:id", actualizarProducto);
+router.put("/:id", autenticar, actualizarProducto);
 
 // DELETE /api/productos/:id: elimina un producto y devuelve 204 sin cuerpo.
-router.delete("/:id", eliminarProducto);
+router.delete("/:id", autenticar, eliminarProducto);
 
 module.exports = router;
