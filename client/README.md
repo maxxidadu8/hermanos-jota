@@ -158,5 +158,7 @@ Desde `client`, ejecutar `npm test`. Las pruebas usan Vitest, React Testing
 Library y JSDOM, con respuestas de API simuladas. Comprueban registro/login,
 recuperación de sesión, rutas protegidas, logout, vencimiento, errores y envío
 del Bearer, carrito, confirmación de pedidos, historial y conservación del carrito
-ante errores o cambios de sesión. No crean usuarios, productos ni pedidos en Atlas. `npm run build` verifica
+ante errores o cambios de sesión. También cubren validación, errores y reintentos
+de alta, precarga y cancelación de edición, PUT autenticado y confirmación,
+cancelación y errores de borrado. No crean usuarios, productos ni pedidos en Atlas. `npm run build` verifica
 la compilación para producción.

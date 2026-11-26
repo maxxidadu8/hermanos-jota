@@ -49,9 +49,12 @@ El modelo se define en `models/Product.js` mediante un esquema de Mongoose:
 | `stock` | Number | No |
 | `imagenUrl` | String | No |
 
-Mongoose genera automáticamente un `_id` para cada producto. El precio `0` es
-válido: obligatorio significa que el campo debe estar presente, sin establecer
-un precio mínimo en esta etapa.
+Mongoose genera automáticamente un `_id` para cada producto. El esquema exige un precio finito mayor o igual a cero y, cuando se indica, un
+stock entero seguro no negativo. El precio `0`, el stock `0` y el stock omitido
+o `null` son válidos. Estas validaciones se ejecutan al guardar con el modelo,
+aunque la escritura provenga de un script en lugar del controlador. Las
+actualizaciones directas mediante operaciones de Mongoose requieren
+`runValidators: true` para ejecutar los validadores de actualización.
 
 El servidor utiliza el puerto `3001` por defecto. Se puede cambiar con la variable
 de entorno `PORT`. Para reiniciar automáticamente al editar los archivos, usar

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import App from "../App.jsx";
 import { AuthProvider, useAuth } from "../context/AuthContext.jsx";
@@ -52,8 +52,11 @@ it("envía Bearer e IDs, confirma, vacía y abre historial",async()=>{
  const post=fetch.mock.calls.find(([r,o])=>r==="/api/pedidos"&&o?.method==="POST");
  expect(post[1].headers.get("Authorization")).toBe(`Bearer ${token}`);
  expect(JSON.parse(post[1].body)).toEqual({items:[{productoId:producto._id,cantidad:1}]});
- const get=fetch.mock.calls.find(([r,o])=>r==="/api/pedidos"&&!o?.method);
- expect(get[1].headers.get("Authorization")).toBe(`Bearer ${token}`);
+ await waitFor(() => {
+  const get=fetch.mock.calls.find(([r,o])=>r==="/api/pedidos"&&!o?.method);
+  expect(get).toBeDefined();
+  expect(get[1].headers.get("Authorization")).toBe(`Bearer ${token}`);
+ });
 });
 it.each(["stock","red","confirmacion"])("conserva carrito ante error de %s",async tipo=>{
  abrir(undefined,true,(r,o)=>{
